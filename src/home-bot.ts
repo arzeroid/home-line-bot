@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 // Dependencies
 import * as fs from 'fs';
 import * as http from 'http';
