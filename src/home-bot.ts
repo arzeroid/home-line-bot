@@ -14,8 +14,8 @@ const CHANNEL_ACCESS_TOKEN: string = process.env.CHANNEL_ACCESS_TOKEN;
 const CHANNEL_SECRET: string = process.env.CHANNEL_SECRET;
 
 const config: line.MiddlewareConfig & line.ClientConfig = {
-    channelAccessToken: 'YOUR_CHANNEL_ACCESS_TOKEN',
-    channelSecret: 'YOUR_CHANNEL_SECRET'
+    channelAccessToken: CHANNEL_ACCESS_TOKEN,
+    channelSecret: CHANNEL_SECRET
 };
 
 const app: Express = express();
