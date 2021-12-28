@@ -95,8 +95,7 @@ function handleEvent(event: line.WebhookEvent) {
             return reply(replyToken, 'incorrect fotmat: ลบรายการ-ชื่อรายการ-ลำดับรายการ');
         }
 
-        memory[id][messages[1]][parseInt(messages[2]) - 1] = undefined;
-
+        memory[id][messages[1]].splice(parseInt(messages[2]) - 1, 1);
         return reply(event.replyToken, 'ลบเรียบร้อย');
     }
 
