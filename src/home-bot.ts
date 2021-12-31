@@ -115,7 +115,7 @@ function handleEvent(event: line.WebhookEvent) {
             return reply(replyToken, 'ไม่พบรายการที่ระบุ');
         }
 
-        memory[id][messages[0]].splice(parseInt(messages[1]) - 1, 1);
+        memory[id][messages[0]].splice(parseInt(messages[1]), 1);
         isChange = true;
         return reply(event.replyToken, 'ลบเรียบร้อย');
     }
