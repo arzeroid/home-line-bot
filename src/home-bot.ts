@@ -70,6 +70,11 @@ function handleEvent(event: line.WebhookEvent) {
             return reply(replyToken, 'incorrect fotmat: เพิ่มรายการ<ชื่อรายการ>:รายละเอียด');
         }
 
+        message = messages[2].trim();
+        if(message.length == 0) {
+            return reply(replyToken, 'incorrect fotmat: รายละเอียดต้องมีข้อมูล');
+        }
+
         if(!memory[id]){
             memory[id] = {};
         }
@@ -78,7 +83,7 @@ function handleEvent(event: line.WebhookEvent) {
             memory[id][messages[1]] = [];
         }
 
-        memory[id][messages[1]].push(messages[2]);
+        memory[id][messages[1]].push(message);
         return reply(replyToken, 'บันทึกเรียบร้อย');
     }
     else if(message.startsWith('แสดงรายการ')) {
