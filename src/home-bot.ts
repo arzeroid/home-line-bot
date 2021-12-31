@@ -1,6 +1,5 @@
 require('dotenv').config();
 
-// Dependencies
 import * as fs from 'fs';
 import * as http from 'http';
 import * as https from 'https';
@@ -140,8 +139,9 @@ function reply(replyToken: string, text: string) {
 function writeMemory() {
     if(isChange){
         fs.writeFileSync(RESOURCE_FILE, jsonStringify(memory));
+        console.log('memory write');
+        isChange = false;
     }
-    console.log('memory write');
     setTimeout(writeMemory, 5000)
 }
 
