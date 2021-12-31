@@ -112,7 +112,7 @@ function handleEvent(event: line.WebhookEvent) {
             return reply(replyToken, 'incorrect fotmat: ลบรายการ<ชื่อรายการ>:ลำดับรายการ');
         }
 
-        if(!memory[id][messages[1]]){
+        if(!memory[id] || !memory[id][messages[1]]){
             return reply(replyToken, 'ไม่พบชื่อรายการที่ระบุ');
         }
 
