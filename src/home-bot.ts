@@ -71,7 +71,7 @@ function handleEvent(event: line.WebhookEvent) {
             return reply(replyToken, 'incorrect fotmat: เพิ่มรายการ<ชื่อรายการ>:รายละเอียด');
         }
 
-        message = messages[2].trim();
+        message = messages[1].trim();
         if(message.length == 0) {
             return reply(replyToken, 'incorrect fotmat: รายละเอียดต้องมีข้อมูล');
         }
@@ -80,11 +80,11 @@ function handleEvent(event: line.WebhookEvent) {
             memory[id] = {};
         }
 
-        if(!memory[id][messages[1]]){
-            memory[id][messages[1]] = [];
+        if(!memory[id][messages[0]]){
+            memory[id][messages[0]] = [];
         }
 
-        memory[id][messages[1]].push(message);
+        memory[id][messages[0]].push(message);
         isChange = true;
         return reply(replyToken, 'บันทึกเรียบร้อย');
     }
@@ -122,11 +122,11 @@ function handleEvent(event: line.WebhookEvent) {
             return reply(replyToken, 'ไม่พบชื่อรายการที่ระบุ');
         }
 
-        if(!memory[id][messages[1]]) {
+        if(!memory[id][messages[0]]) {
             return reply(replyToken, 'ไม่พบรายการที่ระบุ');
         }
 
-        memory[id][messages[1]].splice(parseInt(messages[1]) - 1, 1);
+        memory[id][messages[0]].splice(parseInt(messages[1]) - 1, 1);
         isChange = true;
         return reply(event.replyToken, 'ลบเรียบร้อย');
     }
