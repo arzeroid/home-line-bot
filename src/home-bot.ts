@@ -45,7 +45,8 @@ app.post('/webhook', line.middleware(config), (req, res) => {
         .then((result) => res.json(result));
 });
 
-const client = new line.Client(config);
+const client: line.Client = new line.Client(config);
+let isChange: boolean = false;
 function handleEvent(event: line.WebhookEvent) {
     if (event.type !== 'message' || event.message.type !== 'text') {
         return Promise.resolve(null);
@@ -84,6 +85,7 @@ function handleEvent(event: line.WebhookEvent) {
         }
 
         memory[id][messages[1]].push(message);
+        isChange = true;
         return reply(replyToken, 'บันทึกเรียบร้อย');
     }
     else if(message.startsWith('แสดงรายการ')) {
@@ -125,6 +127,7 @@ function handleEvent(event: line.WebhookEvent) {
         }
 
         memory[id][messages[1]].splice(parseInt(messages[1]) - 1, 1);
+        isChange = true;
         return reply(event.replyToken, 'ลบเรียบร้อย');
     }
 
@@ -145,8 +148,10 @@ function reply(replyToken: string, text: string) {
 }
 
 setTimeout(()=> {
-    fs.writeFileSync(RESOURCE_FILE, jsonStringify(memory));
-}, 3600000)
+    if(isChange){
+        fs.writeFileSync(RESOURCE_FILE, jsonStringify(memory));
+    }
+}, 5000)
 
 // Starting both http & https servers
 const httpServer: http.Server = http.createServer(app);
