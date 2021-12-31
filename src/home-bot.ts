@@ -66,7 +66,7 @@ function handleEvent(event: line.WebhookEvent) {
     if(message.startsWith('เพิ่มรายการ')) {
         message = message.substring('เพิ่มรายการ'.length);
         const messages: Array<string> = message.split(':');
-        if(messages.length != 3) {
+        if(messages.length != 2) {
             return reply(replyToken, 'incorrect fotmat: เพิ่มรายการ<ชื่อรายการ>:รายละเอียด');
         }
 
