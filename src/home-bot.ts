@@ -61,12 +61,13 @@ function handleEvent(event: line.WebhookEvent) {
     }
 
     const replyToken: string = event.replyToken;
-    const message: string = event.message.text;
+    let message: string = event.message.text;
 
-    if(message.includes('แจ้งเตือน') || message.includes('เพิ่มรายการ')) {
-        const messages: Array<string> = message.split('-');
+    if(message.startsWith('เพิ่มรายการ')) {
+        message = message.substring('เพิ่มรายการ'.length);
+        const messages: Array<string> = message.split(':');
         if(messages.length != 3) {
-            return reply(replyToken, 'incorrect fotmat: เพิ่มรายการ-ชื่อรายการ-รายละเอียด');
+            return reply(replyToken, 'incorrect fotmat: เพิ่มรายการ<ชื่อรายการ>:รายละเอียด');
         }
 
         if(!memory[id]){
@@ -80,22 +81,37 @@ function handleEvent(event: line.WebhookEvent) {
         memory[id][messages[1]].push(messages[2]);
         return reply(replyToken, 'บันทึกเรียบร้อย');
     }
-    else if(message.includes('แสดงรายการ')) {
-        const messages: Array<string> = message.split('-');
-        if(messages.length != 2) {
-            return reply(replyToken, 'incorrect fotmat: แสดงรายการ-ชื่อรายการ');
+    else if(message.startsWith('แสดงรายการ')) {
+        message = message.substring('แสดงรายการ'.length);
+        if(message.length < 0) {
+            return reply(replyToken, 'incorrect fotmat: แสดงรายการ<ชื่อรายการ>');
         }
 
-        return reply(replyToken, jsonStringify(memory[id][messages[1]]));
+        if(!memory[id][message]){
+            return reply(replyToken, jsonStringify([]));
+        }
+
+        const list: NodeJS.Dict<string> = {};
+        const messages: Array<string> = memory[id][message];
+        for(let index in messages){
+            list[`${index}`] = messages[index];
+        }
+
+        return reply(replyToken, jsonStringify(memory[id][message]));
     }
 
-    else if(message.includes('ลบรายการ')) {
-        const messages: Array<string> = message.split('-');
-        if(messages.length != 3 || !parseInt(messages[2])) {
-            return reply(replyToken, 'incorrect fotmat: ลบรายการ-ชื่อรายการ-ลำดับรายการ');
+    else if(message.startsWith('ลบรายการ')) {
+        message = message.substring('ลบรายการ'.length);
+        const messages: Array<string> = message.split(':');
+        if(messages.length != 2 || !parseInt(messages[1])) {
+            return reply(replyToken, 'incorrect fotmat: ลบรายการ<ชื่อรายการ>:ลำดับรายการ');
         }
 
-        memory[id][messages[1]].splice(parseInt(messages[2]) - 1, 1);
+        if(!memory[id][messages[1]]){
+            return reply(replyToken, 'ไม่พบชื่อรายการที่ระบุ');
+        }
+
+        memory[id][messages[1]].splice(parseInt(messages[1]) - 1, 1);
         return reply(event.replyToken, 'ลบเรียบร้อย');
     }
 
