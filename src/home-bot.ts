@@ -92,6 +92,10 @@ function handleEvent(event: line.WebhookEvent) {
             return reply(replyToken, 'incorrect fotmat: แสดงรายการ<ชื่อรายการ>');
         }
 
+        if(!memory[id]){
+            return reply(replyToken, 'ไม่พบชื่อรายการที่ระบุ');
+        }
+
         if(!memory[id][message]){
             return reply(replyToken, jsonStringify([]));
         }
@@ -112,8 +116,12 @@ function handleEvent(event: line.WebhookEvent) {
             return reply(replyToken, 'incorrect fotmat: ลบรายการ<ชื่อรายการ>:ลำดับรายการ');
         }
 
-        if(!memory[id] || !memory[id][messages[1]]){
+        if(!memory[id]) {
             return reply(replyToken, 'ไม่พบชื่อรายการที่ระบุ');
+        }
+
+        if(!memory[id][messages[1]]) {
+            return reply(replyToken, 'ไม่พบรายการที่ระบุ');
         }
 
         memory[id][messages[1]].splice(parseInt(messages[1]) - 1, 1);
