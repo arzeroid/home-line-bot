@@ -46,11 +46,13 @@ async function handleEvent(event: line.WebhookEvent) {
     }
 
     const replyToken: string = event.replyToken;
-    const result: HandlerResult = new TextHandler(memory).handle(event);
+    if(event.message.type == 'text'){
+        const result: HandlerResult = new TextHandler(memory).handle(event);
 
-    isChange = isChange || result.isChange;
-    if(result.message) {
-        reply(replyToken, result.message);
+        isChange = isChange || result.isChange;
+        if(result.message) {
+            reply(replyToken, result.message);
+        }
     }
 
     if(event.message.type == 'image'){
