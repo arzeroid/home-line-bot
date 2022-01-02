@@ -48,7 +48,7 @@ function handleEvent(event: line.WebhookEvent) {
     const replyToken: string = event.replyToken;
     const result: HandlerResult = new TextHandler(memory).handle(event);
 
-    isChange ||= result.isChange;
+    isChange = isChange || result.isChange;
     if(result.message) {
         reply(replyToken, result.message);
     }
