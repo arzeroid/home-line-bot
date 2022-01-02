@@ -37,11 +37,11 @@ app.post('/webhook', line.middleware(config), (req, res) => {
 
 const client: line.Client = new line.Client(config);
 let isChange: boolean = false;
-function handleEvent(event: line.WebhookEvent) {
+async function handleEvent(event: line.WebhookEvent) {
 
     console.log(jsonStringify(event));
 
-    if (event.type !== 'message' || event.message.type !== 'text') {
+    if (event.type !== 'message' || (event.message.type !== 'text' && event.message.type !== 'image')) {
         return Promise.resolve(null);
     }
 
@@ -53,6 +53,11 @@ function handleEvent(event: line.WebhookEvent) {
         reply(replyToken, result.message);
     }
 
+    if(event.message.type == 'image'){
+        const content = await client.getMessageContent(event.message.id);
+        const writableStream: fs.WriteStream = fs.createWriteStream('file2.jpg');
+        writableStream.write(content.read());
+    }
 }
 
 function reply(replyToken: string, text: string) {
