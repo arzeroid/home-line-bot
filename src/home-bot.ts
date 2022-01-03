@@ -9,7 +9,7 @@ import {SecureContextOptions} from 'node:tls';
 import * as line from '@line/bot-sdk';
 import { jsonStringify } from './utils';
 import lineBotClient from './line-bot-client';
-import notificationHandler from './handlers/reminder-handler';
+import reminderHandler from './handlers/reminder-handler';
 import memoryHandler from './handlers/memory-handler';
 
 const app: Express = express();
@@ -34,11 +34,9 @@ function handleEvent(event: line.WebhookEvent) {
 
     const promises: Array<Promise<line.MessageAPIResponseBase>> = [];
     promises.push(memoryHandler.handle(event));
-    promises.push(notificationHandler.handle(event));
-
+    promises.push(reminderHandler.handle(event));
+    return Promise.all(promises);
 }
-
-
 
 const HTTP_MODE: string = process.env.HTTP_MODE;
 const CERT_PATH: string = process.env.CERT_PATH;

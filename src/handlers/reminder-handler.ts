@@ -72,16 +72,20 @@ class ReminderHandler {
                 this.jobs[id] = [];
             }
 
-            const data: JobData = {
-                cronTime: cronTime,
-                message: text
-            };
-            const job: CronJob = this.createNewCronJob(id, data);
-
-            this.jobData[id].push(data);
-            this.jobs[id].push(job);
-            this.isChange = true;
-            return lineBotClient.replyMessage(replyToken, 'เพิ่มการแจ้งเตือนแล้ว');
+            try {
+                const data: JobData = {
+                    cronTime: cronTime,
+                    message: text
+                };
+                const job: CronJob = this.createNewCronJob(id, data);
+                this.jobData[id].push(data);
+                this.jobs[id].push(job);
+                this.isChange = true;
+                return lineBotClient.replyMessage(replyToken, 'เพิ่มการแจ้งเตือนแล้ว');
+            }
+            catch(ex) {
+                return lineBotClient.replyMessage(replyToken, (<Error> ex).message);
+            }
         }
         else if(text.startsWith('แสดงการแจ้งเตือน')) {
 
