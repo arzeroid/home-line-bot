@@ -1,4 +1,4 @@
-export interface HandlerResult {
-    isChange: boolean;
-    message: string;
+export interface JobData {
+    cronTime: string | Date;
+    message: string
 }
