@@ -86,7 +86,7 @@ class ReminderHandler {
         else if(text.startsWith('แสดงการแจ้งเตือน')) {
 
             const list: Array<string> = [];
-            if(!this.jobData[id]){
+            if(this.jobData[id]){
                 const messages: Array<JobData> = this.jobData[id];
                 for(let index in messages){
                     list[`${index}`] = messages[index];
@@ -95,11 +95,11 @@ class ReminderHandler {
             return lineBotClient.replyMessage(replyToken, jsonStringify(list));
         }
 
-        else if(text.startsWith('ลบการแจ้งเตือน')) {
-            text = text.substring('ลบการแจ้งเตือน'.length);
+        else if(text.startsWith('ยกเลิกการแจ้งเตือน')) {
+            text = text.substring('ยกเลิกการแจ้งเตือน'.length);
             const messages: Array<string> = text.split(':');
             if(messages.length != 2 || !parseInt(messages[1])) {
-                return lineBotClient.replyMessage(replyToken, 'incorrect fotmat: ลบการแจ้งเตือน:ลำดับรายการ');
+                return lineBotClient.replyMessage(replyToken, 'incorrect fotmat: ยกเลิกการแจ้งเตือน:ลำดับรายการ');
             }
 
             const index: number = parseInt(messages[1]);
