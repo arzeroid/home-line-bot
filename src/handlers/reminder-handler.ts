@@ -85,7 +85,7 @@ class ReminderHandler {
         }
         else if(text.startsWith('แสดงการแจ้งเตือน')) {
 
-            const list: Array<string> = [];
+            const list: NodeJS.Dict<JobData> = {};
             if(this.jobData[id]){
                 const messages: Array<JobData> = this.jobData[id];
                 for(let index in messages){
