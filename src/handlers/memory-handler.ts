@@ -85,17 +85,19 @@ class MemoryHandler {
         else if(text.startsWith('ลบรายการ')) {
             text = text.substring('ลบรายการ'.length);
             const messages: Array<string> = text.split(':');
-            if(messages.length != 2 || !parseInt(messages[1])) {
-                return lineBotClient.replyMessage(replyToken, 'incorrect fotmat: ลบรายการ<ชื่อรายการ>:ลำดับรายการ');
-            }
 
             key = messages[0].trim();
+            const index: number = parseInt(messages[1]);
+
+            if(messages.length != 2 || isNaN(index)) {
+                return lineBotClient.replyMessage(replyToken, 'incorrect fotmat: ลบรายการ<ชื่อรายการ>:ลำดับรายการ');
+            }
 
             if(!this.memory[id] || !this.memory[id][key]) {
                 return lineBotClient.replyMessage(replyToken, 'ไม่พบรายการที่ระบุ');
             }
 
-            this.memory[id][key].splice(parseInt(messages[1]), 1);
+            this.memory[id][key].splice(index, 1);
             this.isChange = true;
             return lineBotClient.replyMessage(replyToken, 'ลบเรียบร้อย');
         }

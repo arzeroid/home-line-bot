@@ -98,11 +98,12 @@ class ReminderHandler {
         else if(text.startsWith('ยกเลิกการแจ้งเตือน')) {
             text = text.substring('ยกเลิกการแจ้งเตือน'.length);
             const messages: Array<string> = text.split(':');
-            if(messages.length != 2 || !parseInt(messages[1])) {
+            const index: number = parseInt(messages[1]);
+
+            if(messages.length != 2 || isNaN(index)) {
                 return lineBotClient.replyMessage(replyToken, 'incorrect fotmat: ยกเลิกการแจ้งเตือน:ลำดับรายการ');
             }
 
-            const index: number = parseInt(messages[1]);
             if(this.jobData[id]) {
                 this.jobData[id].splice(index, 1);
                 this.jobs[id][index].stop();
