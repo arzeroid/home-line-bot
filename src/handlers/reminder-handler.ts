@@ -121,7 +121,7 @@ class ReminderHandler {
 
     private writeFile = (): void => {
         if(this.isChange){
-            fs.writeFileSync(CRONJOB_FILE, jsonStringify(this.jobs));
+            fs.writeFileSync(CRONJOB_FILE, jsonStringify(this.jobData));
             console.log('cronfile write');
             this.isChange = false;
         }
