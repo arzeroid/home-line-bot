@@ -120,7 +120,11 @@ class ReminderHandler {
 
     private createNewCronJob = (id: string, data: JobData): CronJob => {
         return new CronJob(data.cronTime, function() {
-            lineBotClient.pushMessage(id, `อย่าลืม${data.message}`);
+            lineBotClient.pushMessage(id, 'ลืมอะไรหรือเปล่านะ');
+            setTimeout(() => {
+                lineBotClient.pushMessage(id, `อย่าลืม${data.message}นะครับ`);
+            }, 10000)
+
         }, null, true, 'Asia/Bangkok');
     }
 
