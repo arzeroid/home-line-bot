@@ -20,6 +20,14 @@ class LineBotClient {
             text: text
         });
     }
+
+    public pushSticker = (id: string, packageId: string, stickerId: string): Promise<line.MessageAPIResponseBase> => {
+        return this.client.(id, {
+            type: 'sticker',
+            packageId: packageId,
+            stickerId: stickerId
+        });
+    }
 }
 
 export default new LineBotClient();
