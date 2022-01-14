@@ -22,7 +22,7 @@ class LineBotClient {
     }
 
     public pushSticker = (id: string, packageId: string, stickerId: string): Promise<line.MessageAPIResponseBase> => {
-        return this.client.(id, {
+        return this.client.pushMessage(id, {
             type: 'sticker',
             packageId: packageId,
             stickerId: stickerId
