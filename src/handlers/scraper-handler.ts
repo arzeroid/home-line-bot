@@ -54,9 +54,9 @@ class Scraper {
 
         if(text.startsWith('monitor ')) {
             text = text.substring('monitor '.length);
-            const messages: Array<string> = text.split(':');
+            const messages: Array<string> = text.split('$');
             if(messages.length != 4) {
-                return lineBotClient.replyMessage(replyToken,  `incorrect fotmat: monitor <url>:<element>:<EXISTS|NOT_EXISTS|VALUE>:<crontime>
+                return lineBotClient.replyMessage(replyToken,  `incorrect fotmat: monitor <url>$<element>$<EXISTS|NOT_EXISTS|VALUE>$<crontime>
                 where crontime: [* ]* * * * *
                     Seconds: 0-59
                     Minutes: 0-59
