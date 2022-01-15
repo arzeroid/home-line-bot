@@ -10,7 +10,6 @@ import { ScraperNotifyEnum } from './enums';
 
 const SCRAPER_FILE: string = process.env.SCRAPER_FILE;
 
-export default
 class Scraper {
     private scraperData: NodeJS.Dict<Array<ScraperData>>;
     private jobs: NodeJS.Dict<Array<CronJob>> = {};
@@ -178,3 +177,5 @@ class Scraper {
     }
 
 }
+
+export default new Scraper();

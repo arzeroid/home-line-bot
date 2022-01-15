@@ -11,6 +11,7 @@ import { jsonStringify } from './utils';
 import lineBotClient from './line-bot-client';
 import reminderHandler from './handlers/reminder-handler';
 import memoryHandler from './handlers/memory-handler';
+import scraperHandler from './handlers/scraper-handler';
 
 const app: Express = express();
 
@@ -35,6 +36,7 @@ function handleEvent(event: line.WebhookEvent) {
     const promises: Array<Promise<line.MessageAPIResponseBase>> = [];
     promises.push(memoryHandler.handle(event));
     promises.push(reminderHandler.handle(event));
+    promises.push(scraperHandler.handle(event));
     return Promise.all(promises);
 }
 
