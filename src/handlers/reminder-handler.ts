@@ -1,24 +1,24 @@
 import * as line from '@line/bot-sdk';
 import { jsonStringify } from '../utils';
 import * as fs from 'fs';
-import { JobData } from '../interfaces';
+import { ReminderData } from '../interfaces';
 import { CronJob } from 'cron';
 import lineBotClient from '../line-bot-client';
 
-const CRONJOB_FILE: string = process.env.CRONJOB_FILE;
+const REMINDER_FILE: string = process.env.REMINDER_FILE;
 
 class ReminderHandler {
-    private jobData: NodeJS.Dict<Array<JobData>>;
+    private jobData: NodeJS.Dict<Array<ReminderData>>;
     private jobs: NodeJS.Dict<Array<CronJob>> = {};
     private isChange: boolean = false;
 
     constructor (){
-        const rawdata: string = fs.readFileSync(CRONJOB_FILE, {encoding: 'utf8'});
+        const rawdata: string = fs.readFileSync(REMINDER_FILE, {encoding: 'utf8'});
         this.jobData = JSON.parse(rawdata);
         this.writeFile();
 
         for (const id in this.jobData) {
-            const data: Array<JobData> = this.jobData[id];
+            const data: Array<ReminderData> = this.jobData[id];
             this.jobs[id] = [];
             for(const d of data){
                 const job: CronJob = this.createNewCronJob(id, d);
@@ -73,7 +73,7 @@ class ReminderHandler {
             }
 
             try {
-                const data: JobData = {
+                const data: ReminderData = {
                     cronTime: cronTime,
                     message: text
                 };
@@ -89,9 +89,9 @@ class ReminderHandler {
         }
         else if(text.startsWith('แสดงการแจ้งเตือน')) {
 
-            const list: NodeJS.Dict<JobData> = {};
+            const list: NodeJS.Dict<ReminderData> = {};
             if(this.jobData[id]){
-                const messages: Array<JobData> = this.jobData[id];
+                const messages: Array<ReminderData> = this.jobData[id];
                 for(let index in messages){
                     list[`${index}`] = messages[index];
                 }
@@ -118,7 +118,7 @@ class ReminderHandler {
         }
     }
 
-    private createNewCronJob = (id: string, data: JobData): CronJob => {
+    private createNewCronJob = (id: string, data: ReminderData): CronJob => {
         return new CronJob(data.cronTime, function() {
             lineBotClient.pushSticker(id, '6325', '10979923');
             lineBotClient.pushMessage(id, 'ลืมอะไรหรือเปล่านะ');
@@ -132,8 +132,8 @@ class ReminderHandler {
 
     private writeFile = (): void => {
         if(this.isChange){
-            fs.writeFileSync(CRONJOB_FILE, jsonStringify(this.jobData));
-            console.log('cronfile write');
+            fs.writeFileSync(REMINDER_FILE, jsonStringify(this.jobData));
+            console.log(`${REMINDER_FILE} write`);
             this.isChange = false;
         }
         setTimeout(this.writeFile, 5000)
