@@ -104,3 +104,5 @@ dist
 .tern-port
 /resources/memory.json
 /resources/cronjob.json
+/resources/scraper.json
+/resources/reminder.json
