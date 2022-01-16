@@ -25,7 +25,8 @@ export default class BaseHandler {
     protected cronData: NodeJS.Dict<Array<CronData>>;
     protected jobs: NodeJS.Dict<Array<CronJob>> = {};
 
-    constructor (){
+    constructor (filePath: string){
+        this.filePath = filePath
         const rawdata: string = fs.readFileSync(this.filePath, {encoding: 'utf8'});
 
         if(this.isCronData){

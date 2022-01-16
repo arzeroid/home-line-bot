@@ -11,7 +11,6 @@ import BaseHandler from './base-handler';
 class Scraper extends BaseHandler{
 
     protected isCronData: boolean = true;
-    protected filePath: string = './resources/scraper.json';
     protected actions: HandlerAction = {
         add: {
             keyword: 'monitor ',
@@ -135,4 +134,4 @@ class Scraper extends BaseHandler{
     });
 }
 
-export default new Scraper();
+export default new Scraper(process.env.SCRAPER_FILE);
