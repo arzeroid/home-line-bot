@@ -8,6 +8,7 @@ import BaseHandler from './base-handler';
 class ReminderHandler extends BaseHandler {
 
     protected isCronData: boolean = true;
+    protected filePath: string = './resources/reminder.json';
     protected actions: HandlerAction = {
         add: {
             keyword: 'เพิ่มการแจ้งเตือน',

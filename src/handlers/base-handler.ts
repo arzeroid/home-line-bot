@@ -12,7 +12,6 @@ export default class BaseHandler {
     // must be init on inherit class
     protected isCronData: boolean;
     protected actions: HandlerAction;
-    protected getFilePath: Function;
     protected addFn: HandlerFn;
     protected showFn: HandlerFn;
     protected cancelFn: HandlerFn;
@@ -27,7 +26,6 @@ export default class BaseHandler {
     protected jobs: NodeJS.Dict<Array<CronJob>> = {};
 
     constructor (){
-        this.filePath = this.getFilePath();
         const rawdata: string = fs.readFileSync(this.filePath, {encoding: 'utf8'});
 
         if(this.isCronData){

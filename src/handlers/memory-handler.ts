@@ -7,7 +7,7 @@ import { AdditionalAction, HandlerAction, HandlerFn } from '../interfaces';
 class MemoryHandler extends BaseHandler {
 
     protected isCronData: boolean = false;
-    protected filePath: string = process.env.MEMORY_FILE;;
+    protected filePath: string = './resources/memory.json';
     protected actions: HandlerAction = {
         add: {
             keyword: 'เพิ่มรายการ',

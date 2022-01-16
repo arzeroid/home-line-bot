@@ -11,6 +11,7 @@ import BaseHandler from './base-handler';
 class Scraper extends BaseHandler{
 
     protected isCronData: boolean = true;
+    protected filePath: string = './resources/scraper.json';
     protected actions: HandlerAction = {
         add: {
             keyword: 'monitor ',
@@ -26,9 +27,6 @@ class Scraper extends BaseHandler{
         }
     };
 
-    protected getFilePath: Function = (): string => {
-        return process.env.SCRAPER_FILE;
-    };
 
     protected addFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
         const messages: Array<string> = text.split('$');
