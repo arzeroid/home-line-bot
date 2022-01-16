@@ -69,6 +69,11 @@ export default class BaseHandler {
                 const handlerData: HandlerActionData= this.actions[key];
                 syntaxList.push(handlerData.syntax);
             }
+
+            for(let action of this.additionalActions){
+                syntaxList.push(action.syntax);
+            }
+
             return lineBotClient.pushMessage(id, jsonStringify(syntaxList));
         }
 
