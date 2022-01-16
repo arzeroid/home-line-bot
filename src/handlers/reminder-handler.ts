@@ -1,17 +1,14 @@
 import * as line from '@line/bot-sdk';
 import { jsonStringify } from '../utils';
-import * as fs from 'fs';
 import { CronFn, HandlerAction, HandlerFn, ReminderData } from '../interfaces';
 import { CronCommand, CronJob } from 'cron';
 import lineBotClient from '../line-bot-client';
 import BaseHandler from './base-handler';
 
-const REMINDER_FILE: string = process.env.REMINDER_FILE;
-
 class ReminderHandler extends BaseHandler {
 
     protected isCronData: boolean = true;
-    protected filePath: string = process.env.SCRAPER_FILE;;
+    protected filePath: string = process.env.REMINDER_FILE;;
     protected actions: HandlerAction = {
         add: {
             keyword: 'เพิ่มการแจ้งเตือน',
