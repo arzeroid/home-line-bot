@@ -69,7 +69,7 @@ export default class BaseHandler {
                 const handlerData: HandlerActionData= this.actions[key];
                 syntaxList.push(handlerData.syntax);
             }
-            return lineBotClient.replyMessage(replyToken, jsonStringify(syntaxList));
+            return lineBotClient.pushMessage(id, jsonStringify(syntaxList));
         }
 
         if(text.startsWith(this.actions.add.keyword)) {
