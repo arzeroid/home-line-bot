@@ -12,6 +12,7 @@ import lineBotClient from './line-bot-client';
 import reminderHandler from './handlers/reminder-handler';
 import memoryHandler from './handlers/memory-handler';
 import scraperHandler from './handlers/scraper-handler';
+import BaseHandler from './handlers/base-handler';
 
 const app: Express = express();
 
@@ -32,6 +33,12 @@ function handleEvent(event: line.WebhookEvent) {
     if (event.type !== 'message' || (event.message.type !== 'text')) {
         return Promise.resolve(null);
     }
+
+    const handlers: Array<BaseHandler> = [
+        memoryHandler,
+        reminderHandler,
+        scraperHandler
+    ];
 
     const promises: Array<Promise<line.MessageAPIResponseBase>> = [];
     promises.push(memoryHandler.handle(event));

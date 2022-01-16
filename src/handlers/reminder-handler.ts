@@ -1,143 +1,106 @@
 import * as line from '@line/bot-sdk';
 import { jsonStringify } from '../utils';
 import * as fs from 'fs';
-import { ReminderData } from '../interfaces';
-import { CronJob } from 'cron';
+import { CronFn, HandlerAction, HandlerFn, ReminderData } from '../interfaces';
+import { CronCommand, CronJob } from 'cron';
 import lineBotClient from '../line-bot-client';
+import BaseHandler from './base-handler';
 
 const REMINDER_FILE: string = process.env.REMINDER_FILE;
 
-class ReminderHandler {
-    private jobData: NodeJS.Dict<Array<ReminderData>>;
-    private jobs: NodeJS.Dict<Array<CronJob>> = {};
-    private isChange: boolean = false;
+class ReminderHandler extends BaseHandler {
 
-    constructor (){
-        const rawdata: string = fs.readFileSync(REMINDER_FILE, {encoding: 'utf8'});
-        this.jobData = JSON.parse(rawdata);
-        this.writeFile();
+    protected isCronData: boolean = true;
+    protected filePath: string = process.env.SCRAPER_FILE;;
+    protected actions: HandlerAction = {
+        add: {
+            keyword: 'เพิ่มการแจ้งเตือน',
+            syntax: 'เพิ่มการแจ้งเตือน<ชื่อการแจ้งเตือน>:crontime'
+        },
+        show: {
+            keyword: 'แสดงการแจ้งเตือน',
+            syntax: 'แสดงการแจ้งเตือน'
+        },
+        cancel: {
+            keyword: 'ยกเลิกการแจ้งเตือน',
+            syntax: 'ยกเลิกการแจ้งเตือน:ลำดับรายการ'
+        }
+    };
 
-        for (const id in this.jobData) {
-            const data: Array<ReminderData> = this.jobData[id];
+    protected addFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
+        const messages: Array<string> = text.split(':');
+        if(messages.length != 2) {
+            return lineBotClient.replyMessage(replyToken,  `incorrect fotmat: ${this.actions.add.syntax}`);
+        }
+
+        const topic: string = messages[0].trim();
+        const cronTime: string = messages[1].trim();
+
+        if(topic.length == 0) {
+            return lineBotClient.replyMessage(replyToken,  'incorrect fotmat: ชื่อการแจ้งเตือนต้องมีข้อมูล');
+        }
+
+        if(cronTime.length == 0 || cronTime.split(' ').length < 5) {
+            return lineBotClient.replyMessage(replyToken,  'incorrect fotmat: crontime ต้องมีข้อมูล');
+        }
+
+        if(!this.cronData[id]){
+            this.cronData[id] = [];
             this.jobs[id] = [];
-            for(const d of data){
-                const job: CronJob = this.createNewCronJob(id, d);
-                this.jobs[id].push(job);
-            }
-        }
-    }
-
-    public handle = (event: line.MessageEvent): Promise<line.MessageAPIResponseBase> => {
-
-        const replyToken: string = event.replyToken;
-        const source: line.EventSource = event.source;
-        let id: string = null;
-        if(source.type == 'user') {
-            id = source.userId;
-        }
-        else if(source.type == 'group') {
-            id = source.groupId;
         }
 
-        let message: line.TextEventMessage = <line.TextEventMessage> event.message;
-        let text: string = message.text;
 
-        if(text.startsWith('เพิ่มการแจ้งเตือน')) {
-            text = text.substring('เพิ่มการแจ้งเตือน'.length);
-            const messages: Array<string> = text.split(':');
-            if(messages.length != 2) {
-                return lineBotClient.replyMessage(replyToken,  `incorrect fotmat: เพิ่มการแจ้งเตือน<ชื่อการแจ้งเตือน>:crontime
-                where crontime: [* ]* * * * *
-                    Seconds: 0-59
-                    Minutes: 0-59
-                    Hours: 0-23
-                    Day of Month: 1-31
-                    Months: 0-11 (Jan-Dec)
-                    Day of Week: 0-6 (Sun-Sat)`);
-            }
+        const data: ReminderData = {
+            cronTime: cronTime,
+            message: topic
+        };
+        const job: CronJob = this.createNewCronJob(id, data);
+        this.cronData[id].push(data);
+        this.jobs[id].push(job);
+        this.isChange = true;
+        return lineBotClient.replyMessage(replyToken, 'เพิ่มการแจ้งเตือนแล้ว');
 
-            text = messages[0].trim();
-            const cronTime: string = messages[1].trim();
+    };
 
-            if(text.length == 0) {
-                return lineBotClient.replyMessage(replyToken,  'incorrect fotmat: ชื่อการแจ้งเตือนต้องมีข้อมูล');
-            }
-
-            if(cronTime.length == 0 || cronTime.split(' ').length < 5) {
-                return lineBotClient.replyMessage(replyToken,  'incorrect fotmat: crontime ต้องมีข้อมูล');
-            }
-
-            if(!this.jobData[id]){
-                this.jobData[id] = [];
-                this.jobs[id] = [];
-            }
-
-            try {
-                const data: ReminderData = {
-                    cronTime: cronTime,
-                    message: text
-                };
-                const job: CronJob = this.createNewCronJob(id, data);
-                this.jobData[id].push(data);
-                this.jobs[id].push(job);
-                this.isChange = true;
-                return lineBotClient.replyMessage(replyToken, 'เพิ่มการแจ้งเตือนแล้ว');
-            }
-            catch(ex) {
-                return lineBotClient.replyMessage(replyToken, (<Error> ex).message);
-            }
-        }
-        else if(text.startsWith('แสดงการแจ้งเตือน')) {
-
-            const list: NodeJS.Dict<ReminderData> = {};
-            if(this.jobData[id]){
-                const messages: Array<ReminderData> = this.jobData[id];
+    protected showFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
+        const list: NodeJS.Dict<ReminderData> = {};
+            if(this.cronData[id]){
+                const messages: Array<ReminderData> = <Array<ReminderData>> this.cronData[id];
                 for(let index in messages){
                     list[`${index}`] = messages[index];
                 }
             }
             return lineBotClient.replyMessage(replyToken, jsonStringify(list));
+
+    };
+
+    protected cancelFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
+        const messages: Array<string> = text.split(':');
+        const index: number = parseInt(messages[1]);
+
+        if(messages.length != 2 || isNaN(index)) {
+            return lineBotClient.replyMessage(replyToken, `incorrect fotmat: ${this.actions.cancel.syntax}`);
         }
 
-        else if(text.startsWith('ยกเลิกการแจ้งเตือน')) {
-            text = text.substring('ยกเลิกการแจ้งเตือน'.length);
-            const messages: Array<string> = text.split(':');
-            const index: number = parseInt(messages[1]);
-
-            if(messages.length != 2 || isNaN(index)) {
-                return lineBotClient.replyMessage(replyToken, 'incorrect fotmat: ยกเลิกการแจ้งเตือน:ลำดับรายการ');
-            }
-
-            if(this.jobData[id]) {
-                this.jobData[id].splice(index, 1);
-                this.jobs[id][index].stop();
-                this.jobs[id].splice(index, 1);
-                this.isChange = true;
-            }
-            return lineBotClient.replyMessage(replyToken, 'ลบการแจ้งเตือนแล้ว');
+        if(this.cronData[id]) {
+            this.cronData[id].splice(index, 1);
+            this.jobs[id][index].stop();
+            this.jobs[id].splice(index, 1);
+            this.isChange = true;
         }
-    }
+        return lineBotClient.replyMessage(replyToken, 'ลบการแจ้งเตือนแล้ว');
+    };
 
-    private createNewCronJob = (id: string, data: ReminderData): CronJob => {
-        return new CronJob(data.cronTime, function() {
+    protected cronFn: CronFn = (id: string, data: ReminderData): CronCommand => {
+        return () => {
             lineBotClient.pushSticker(id, '6325', '10979923');
             lineBotClient.pushMessage(id, 'ลืมอะไรหรือเปล่านะ');
 
             setTimeout(() => {
                 lineBotClient.pushMessage(id, `อย่าลืม${data.message}นะครับ`);
             }, 10000)
-
-        }, null, true, 'Asia/Bangkok');
-    }
-
-    private writeFile = (): void => {
-        if(this.isChange){
-            fs.writeFileSync(REMINDER_FILE, jsonStringify(this.jobData));
-            console.log(`${REMINDER_FILE} write`);
-            this.isChange = false;
         }
-        setTimeout(this.writeFile, 5000)
-    }
+    };
 }
 
 export default new ReminderHandler();
