@@ -23,6 +23,10 @@ class MemoryHandler extends BaseHandler {
         }
     };
 
+    protected getFilePath: Function = (): string => {
+        return process.env.MEMORY_FILE;
+    };
+
     protected additionalActions: Array<AdditionalAction> = [
         {
             keyword: 'แสดงหัวข้อรายการทั้งหมด',

@@ -7,11 +7,12 @@ import lineBotClient from '../line-bot-client';
 
 export default class BaseHandler {
     protected isChange: boolean = false;
+    protected filePath: string;
 
     // must be init on inherit class
     protected isCronData: boolean;
-    protected filePath: string;
     protected actions: HandlerAction;
+    protected getFilePath: Function;
     protected addFn: HandlerFn;
     protected showFn: HandlerFn;
     protected cancelFn: HandlerFn;
@@ -26,6 +27,7 @@ export default class BaseHandler {
     protected jobs: NodeJS.Dict<Array<CronJob>> = {};
 
     constructor (){
+        this.filePath = this.getFilePath();
         const rawdata: string = fs.readFileSync(this.filePath, {encoding: 'utf8'});
 
         if(this.isCronData){
