@@ -28,8 +28,6 @@ app.post('/webhook', line.middleware(lineBotClient.config), (req, res) => {
 
 function handleEvent(event: line.WebhookEvent) {
 
-    console.log(jsonStringify(event));
-
     if (event.type !== 'message' || (event.message.type !== 'text')) {
         return Promise.resolve(null);
     }
@@ -72,5 +70,3 @@ else if(HTTP_MODE == 'HTTPS') {
         console.log('HTTPS Server running on port 443');
     });
 }
-
-

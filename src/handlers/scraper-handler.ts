@@ -31,7 +31,7 @@ class ScraperHandler extends BaseHandler{
     protected addFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
         const messages: Array<string> = text.split('$');
         if(messages.length != 4) {
-            return lineBotClient.replyMessage(replyToken,  `incorrect fotmat: ${this.actions.add.syntax}`);
+            return lineBotClient.replyMessage(replyToken, `incorrect fotmat: ${this.actions.add.syntax}`);
         }
 
         const url: string = messages[0].trim();
@@ -40,19 +40,19 @@ class ScraperHandler extends BaseHandler{
         const cronTime: string = messages[3].trim();
 
         if(url.length == 0) {
-            return lineBotClient.replyMessage(replyToken,  'incorrect fotmat: url ต้องมีข้อมูล');
+            return lineBotClient.replyMessage(replyToken, 'incorrect fotmat: url ต้องมีข้อมูล');
         }
 
         if(element.length == 0) {
-            return lineBotClient.replyMessage(replyToken,  'incorrect fotmat: element ต้องมีข้อมูล');
+            return lineBotClient.replyMessage(replyToken, 'incorrect fotmat: element ต้องมีข้อมูล');
         }
 
         if(ScraperNotifyEnum[notifyWhen] == undefined) {
-            return lineBotClient.replyMessage(replyToken,  'incorrect fotmat: notify_when ไม่ถูกต้อง');
+            return lineBotClient.replyMessage(replyToken, 'incorrect fotmat: notify_when ไม่ถูกต้อง');
         }
 
         if(cronTime.length == 0 || cronTime.split(' ').length < 5) {
-            return lineBotClient.replyMessage(replyToken,  'incorrect fotmat: crontime ต้องมีข้อมูล');
+            return lineBotClient.replyMessage(replyToken, 'incorrect fotmat: crontime ต้องมีข้อมูล');
         }
 
         if(!this.cronData[id]){

@@ -25,30 +25,27 @@ class ReminderHandler extends BaseHandler {
         }
     };
 
-
-
     protected addFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
         const messages: Array<string> = text.split(':');
         if(messages.length != 2) {
-            return lineBotClient.replyMessage(replyToken,  `incorrect fotmat: ${this.actions.add.syntax}`);
+            return lineBotClient.replyMessage(replyToken, `incorrect fotmat: ${this.actions.add.syntax}`);
         }
 
         const topic: string = messages[0].trim();
         const cronTime: string = messages[1].trim();
 
         if(topic.length == 0) {
-            return lineBotClient.replyMessage(replyToken,  'incorrect fotmat: ชื่อการแจ้งเตือนต้องมีข้อมูล');
+            return lineBotClient.replyMessage(replyToken, 'incorrect fotmat: ชื่อการแจ้งเตือนต้องมีข้อมูล');
         }
 
         if(cronTime.length == 0 || cronTime.split(' ').length < 5) {
-            return lineBotClient.replyMessage(replyToken,  'incorrect fotmat: crontime ต้องมีข้อมูล');
+            return lineBotClient.replyMessage(replyToken, 'incorrect fotmat: crontime ต้องมีข้อมูล');
         }
 
         if(!this.cronData[id]){
             this.cronData[id] = [];
             this.jobs[id] = [];
         }
-
 
         const data: ReminderData = {
             cronTime: cronTime,

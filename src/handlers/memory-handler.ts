@@ -34,8 +34,6 @@ class MemoryHandler extends BaseHandler {
         }
     ];
 
-
-
     protected addFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
         const messages: Array<string> = text.split(':');
             if(messages.length != 2) {
