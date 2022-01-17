@@ -8,9 +8,11 @@ import lineBotClient from '../line-bot-client';
 import { ScraperNotifyEnum } from '../enums';
 import BaseHandler from './base-handler';
 
-class Scraper extends BaseHandler{
+class ScraperHandler extends BaseHandler{
 
     protected isCronData: boolean = true;
+    protected filePath: string = process.env.SCRAPER_FILE;
+
     protected actions: HandlerAction = {
         add: {
             keyword: 'monitor ',
@@ -25,10 +27,6 @@ class Scraper extends BaseHandler{
             syntax: 'cancel monitor:ลำดับรายการ'
         }
     };
-
-    constructor() {
-        super(process.env.SCRAPER_FILE, true);
-    }
 
     protected addFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
         const messages: Array<string> = text.split('$');
@@ -137,5 +135,6 @@ class Scraper extends BaseHandler{
     });
 }
 
-
-export default new Scraper();
+const instance: ScraperHandler = new ScraperHandler();
+instance.setup();
+export default new ScraperHandler();

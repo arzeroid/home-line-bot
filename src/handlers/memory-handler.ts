@@ -7,6 +7,8 @@ import { AdditionalAction, HandlerAction, HandlerFn } from '../interfaces';
 class MemoryHandler extends BaseHandler {
 
     protected isCronData: boolean = false;
+    protected filePath: string = process.env.MEMORY_FILE;
+
     protected actions: HandlerAction = {
         add: {
             keyword: 'เพิ่มรายการ',
@@ -32,9 +34,7 @@ class MemoryHandler extends BaseHandler {
         }
     ];
 
-    constructor() {
-        super(process.env.MEMORY_FILE, false);
-    }
+
 
     protected addFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
         const messages: Array<string> = text.split(':');
@@ -103,5 +103,6 @@ class MemoryHandler extends BaseHandler {
     };
 
 }
-
-export default new MemoryHandler();
+const instance: MemoryHandler = new MemoryHandler();
+instance.setup();
+export default instance;

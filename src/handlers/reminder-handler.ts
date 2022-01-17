@@ -8,6 +8,8 @@ import BaseHandler from './base-handler';
 class ReminderHandler extends BaseHandler {
 
     protected isCronData: boolean = true;
+    protected filePath: string = process.env.REMINDER_FILE;
+
     protected actions: HandlerAction = {
         add: {
             keyword: 'เพิ่มการแจ้งเตือน',
@@ -23,9 +25,7 @@ class ReminderHandler extends BaseHandler {
         }
     };
 
-    constructor() {
-        super(process.env.REMINDER_FILE, true);
-    }
+
 
     protected addFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
         const messages: Array<string> = text.split(':');
@@ -102,5 +102,8 @@ class ReminderHandler extends BaseHandler {
         }
     };
 }
+
+const instance: ReminderHandler = new ReminderHandler();
+instance.setup();
 
 export default new ReminderHandler();
