@@ -23,6 +23,10 @@ class ReminderHandler extends BaseHandler {
         }
     };
 
+    constructor() {
+        super(process.env.REMINDER_FILE, true);
+    }
+
     protected addFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
         const messages: Array<string> = text.split(':');
         if(messages.length != 2) {
@@ -99,4 +103,4 @@ class ReminderHandler extends BaseHandler {
     };
 }
 
-export default new ReminderHandler(process.env.REMINDER_FILE);
+export default new ReminderHandler();

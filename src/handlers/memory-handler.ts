@@ -32,6 +32,10 @@ class MemoryHandler extends BaseHandler {
         }
     ];
 
+    constructor() {
+        super(process.env.MEMORY_FILE, false);
+    }
+
     protected addFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
         const messages: Array<string> = text.split(':');
             if(messages.length != 2) {
@@ -100,4 +104,4 @@ class MemoryHandler extends BaseHandler {
 
 }
 
-export default new MemoryHandler(process.env.MEMORY_FILE);
+export default new MemoryHandler();

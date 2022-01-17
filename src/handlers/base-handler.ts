@@ -25,12 +25,14 @@ export default class BaseHandler {
     protected cronData: NodeJS.Dict<Array<CronData>>;
     protected jobs: NodeJS.Dict<Array<CronJob>> = {};
 
-    constructor (filePath: string){
+    constructor (filePath: string, isCronData: boolean = false){
+        this.isCronData = isCronData;
         this.filePath = filePath
-        const rawdata: string = fs.readFileSync(this.filePath, {encoding: 'utf8'});
-
+        const rawData: string = fs.readFileSync(this.filePath, {encoding: 'utf8'});
+        // console.log(isCronData);
+        // console.log(rawData);
         if(this.isCronData){
-            this.cronData = JSON.parse(rawdata);
+            this.cronData = JSON.parse(rawData);
             for (const id in this.data) {
                 const data: Array<CronData> = <Array<CronData>> this.cronData[id];
                 this.jobs[id] = [];
@@ -41,7 +43,7 @@ export default class BaseHandler {
             }
         }
         else {
-            this.data = JSON.parse(rawdata);
+            this.data = JSON.parse(rawData);
         }
 
         this.writeFile();

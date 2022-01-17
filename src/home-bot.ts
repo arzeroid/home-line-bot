@@ -40,10 +40,8 @@ function handleEvent(event: line.WebhookEvent) {
         scraperHandler
     ];
 
-    const promises: Array<Promise<line.MessageAPIResponseBase>> = [];
-    promises.push(memoryHandler.handle(event));
-    promises.push(reminderHandler.handle(event));
-    promises.push(scraperHandler.handle(event));
+    const promises: Array<Promise<line.MessageAPIResponseBase>> = handlers.map(handler => handler.handle(event));
+
     return Promise.all(promises);
 }
 

@@ -26,6 +26,9 @@ class Scraper extends BaseHandler{
         }
     };
 
+    constructor() {
+        super(process.env.SCRAPER_FILE, true);
+    }
 
     protected addFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
         const messages: Array<string> = text.split('$');
@@ -134,4 +137,5 @@ class Scraper extends BaseHandler{
     });
 }
 
-export default new Scraper(process.env.SCRAPER_FILE);
+
+export default new Scraper();
