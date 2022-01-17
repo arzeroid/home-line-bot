@@ -25,11 +25,12 @@ export default class BaseHandler {
     protected cronData: NodeJS.Dict<Array<CronData>>;
     protected jobs: NodeJS.Dict<Array<CronJob>> = {};
 
-    public setup = (): void => {
+    public setup(): void  {
         const rawData: string = fs.readFileSync(this.filePath, {encoding: 'utf8'});
         // console.log(isCronData);
         // console.log(rawData);
         if(this.isCronData){
+            console.log('test');
             this.cronData = JSON.parse(rawData);
             for (const id in this.cronData) {
                 const data: Array<CronData> = <Array<CronData>> this.cronData[id];
@@ -39,25 +40,25 @@ export default class BaseHandler {
                     this.jobs[id].push(job);
                 }
             }
+            console.log(this.cronData);
         }
         else {
             this.data = JSON.parse(rawData);
         }
-
+        console.log(this.cronData);
         this.writeFile();
     }
 
-    public handle = (event: line.MessageEvent): Promise<line.MessageAPIResponseBase> => {
-
+    public handle (event: line.MessageEvent): Promise<line.MessageAPIResponseBase> {
         const replyToken: string = event.replyToken;
         const source: line.EventSource = event.source;
         let id: string = null;
         if(source.type == 'user') {
             id = source.userId;
         }
-        else if(source.type == 'group') {
-            id = source.groupId;
-        }
+        // else if(source.type == 'group') {
+        //     id = source.groupId;
+        // }
 
         let message: line.TextEventMessage = <line.TextEventMessage> event.message;
         let text: string = message.text;

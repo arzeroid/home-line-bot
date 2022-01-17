@@ -106,4 +106,4 @@ class ReminderHandler extends BaseHandler {
 const instance: ReminderHandler = new ReminderHandler();
 instance.setup();
 
-export default new ReminderHandler();
+export default instance;

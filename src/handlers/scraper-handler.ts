@@ -137,4 +137,4 @@ class ScraperHandler extends BaseHandler{
 
 const instance: ScraperHandler = new ScraperHandler();
 instance.setup();
-export default new ScraperHandler();
+export default instance;
