@@ -33,7 +33,7 @@ export default class BaseHandler {
         // console.log(rawData);
         if(this.isCronData){
             this.cronData = JSON.parse(rawData);
-            for (const id in this.data) {
+            for (const id in this.cronData) {
                 const data: Array<CronData> = <Array<CronData>> this.cronData[id];
                 this.jobs[id] = [];
                 for(const d of data){
