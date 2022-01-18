@@ -49,6 +49,11 @@ export default class BaseHandler {
         const replyToken: string = event.replyToken;
         const source: line.EventSource = event.source;
         let id: string = null;
+
+        if(source.userId != process.env.ADMIN_ID){
+            return null;
+        }
+
         if(source.type == 'user') {
             id = source.userId;
         }
