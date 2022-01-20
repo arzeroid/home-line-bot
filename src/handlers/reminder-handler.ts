@@ -60,6 +60,10 @@ class ReminderHandler extends BaseHandler {
     };
 
     protected showFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
+        if(text.length != 0) {
+            return null;
+        }
+
         const list: NodeJS.Dict<ReminderData> = {};
             if(this.cronData[id]){
                 const messages: Array<ReminderData> = <Array<ReminderData>> this.cronData[id];

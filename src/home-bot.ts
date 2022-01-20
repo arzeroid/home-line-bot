@@ -17,7 +17,7 @@ import BaseHandler from './handlers/base-handler';
 const app: Express = express();
 
 app.get('/', (req, res) => {
-	res.send('Hello there !');
+	res.send('Hello there !!!');
 });
 
 app.post('/webhook', line.middleware(lineBotClient.config), (req, res) => {

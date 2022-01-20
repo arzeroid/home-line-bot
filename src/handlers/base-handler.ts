@@ -50,6 +50,8 @@ export default class BaseHandler {
         const source: line.EventSource = event.source;
         let id: string = null;
 
+        console.log(jsonStringify(event));
+
         if(source.userId != process.env.ADMIN_ID){
             return null;
         }
@@ -89,7 +91,8 @@ export default class BaseHandler {
                 return lineBotClient.replyMessage(replyToken, (<Error> ex).message);
             }
         }
-        else if(text == this.actions.show.keyword) {
+        else if(text.startsWith(this.actions.show.keyword)) {
+            text = text.substring(this.actions.show.keyword.length);
             return this.showFn(id, replyToken, text);
         }
         else if(text.startsWith(this.actions.cancel.keyword)) {

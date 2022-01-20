@@ -74,6 +74,10 @@ class ScraperHandler extends BaseHandler{
     };
 
     protected showFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
+        if(text.length != 0) {
+            return null;
+        }
+
         const list: NodeJS.Dict<ScraperData> = {};
         if(this.cronData[id]){
             const messages: Array<ScraperData> = <Array<ScraperData>> this.cronData[id];
