@@ -66,9 +66,11 @@ export default class BaseHandler {
         if(text == 'แสดงคำสั่งทั้งหมด') {
             const syntaxList: Array<string> = [];
 
-            for(let key of Object.keys(this.actions)){
-                const handlerData: HandlerActionData= this.actions[key];
-                syntaxList.push(handlerData.syntax);
+            if(this.actions) {
+                for(let key of Object.keys(this.actions)){
+                    const handlerData: HandlerActionData= this.actions[key];
+                    syntaxList.push(handlerData.syntax);
+                }
             }
 
             for(let action of this.additionalActions){

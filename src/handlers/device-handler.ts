@@ -66,6 +66,6 @@ class DeviceHandler extends BaseHandler{
     });
 }
 
-const instance: DeviceHandler = new DeviceHandler();
-instance.setup();
-export default instance;
+// const instance: DeviceHandler = new DeviceHandler();
+// instance.setup();
+// export default instance;
