@@ -30,7 +30,7 @@ export default class BaseHandler {
 
         if(this.isCronData){
             this.cronData = JSON.parse(rawData);
-            console.log(this.cronData)
+
             for (const id in this.cronData) {
                 const data: Array<CronData> = <Array<CronData>> this.cronData[id];
                 this.jobs[id] = [];
@@ -78,7 +78,7 @@ export default class BaseHandler {
             return lineBotClient.pushMessage(id, jsonStringify(syntaxList));
         }
 
-        if(text.startsWith(this.actions.add.keyword)) {
+        if(this.actions && text.startsWith(this.actions.add.keyword)) {
             text = text.substring(this.actions.add.keyword.length);
 
             try {
@@ -88,11 +88,11 @@ export default class BaseHandler {
                 return lineBotClient.replyMessage(replyToken, (<Error> ex).message);
             }
         }
-        else if(text.startsWith(this.actions.show.keyword)) {
+        else if(this.actions && text.startsWith(this.actions.show.keyword)) {
             text = text.substring(this.actions.show.keyword.length);
             return this.showFn(id, replyToken, text);
         }
-        else if(text.startsWith(this.actions.cancel.keyword)) {
+        else if(this.actions && text.startsWith(this.actions.cancel.keyword)) {
             text = text.substring(this.actions.cancel.keyword.length);
             return this.cancelFn(id, replyToken, text);
         }
