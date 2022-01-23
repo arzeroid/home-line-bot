@@ -106,3 +106,4 @@ dist
 /resources/cronjob.json
 /resources/scraper.json
 /resources/reminder.json
+/resources/device-manager.json

@@ -30,6 +30,7 @@ export default class BaseHandler {
 
         if(this.isCronData){
             this.cronData = JSON.parse(rawData);
+            console.log(this.cronData)
             for (const id in this.cronData) {
                 const data: Array<CronData> = <Array<CronData>> this.cronData[id];
                 this.jobs[id] = [];
@@ -51,10 +52,6 @@ export default class BaseHandler {
         let id: string = null;
 
         console.log(jsonStringify(event));
-
-        if(source.userId != process.env.ADMIN_ID){
-            return null;
-        }
 
         if(source.type == 'user') {
             id = source.userId;

@@ -14,7 +14,23 @@ export interface ScraperData {
     notifyWhen: ScraperNotifyEnum
 }
 
-export type CronData = ReminderData | ScraperData;
+export interface DeviceData {
+    cronTime: string | Date;
+    local_server_url: string;
+    local_devices: NodeJS.Dict<string>;
+}
+
+export interface DeviceDataRequest {
+    ping_urls: Array<string>
+}
+
+export interface DeviceDataResponse {
+    host: string,
+    alive: boolean,
+    time: number | "unknown";
+}
+
+export type CronData = ReminderData | ScraperData | DeviceData;
 
 export interface HandlerAction {
     add: HandlerActionData;
