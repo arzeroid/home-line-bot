@@ -1,7 +1,6 @@
-import * as line from '@line/bot-sdk';
 import { jsonStringify } from '../utils';
-import { CronFn, HandlerAction, HandlerFn, ReminderData } from '../interfaces';
-import { CronCommand, CronJob } from 'cron';
+import { Action, CronFn, HandlerFn, ReminderData } from '../interfaces';
+import { CronJob } from 'cron';
 import lineBotClient from '../line-bot-client';
 import BaseHandler from './base-handler';
 
@@ -10,36 +9,17 @@ class ReminderHandler extends BaseHandler {
     protected isCronData: boolean = true;
     protected filePath: string = process.env.REMINDER_FILE;
 
-    protected actions: HandlerAction = {
-        add: {
-            keyword: 'เพิ่มการแจ้งเตือน',
-            syntax: 'เพิ่มการแจ้งเตือน<ชื่อการแจ้งเตือน>:crontime'
-        },
-        show: {
-            keyword: 'แสดงการแจ้งเตือน',
-            syntax: 'แสดงการแจ้งเตือน'
-        },
-        cancel: {
-            keyword: 'ยกเลิกการแจ้งเตือน',
-            syntax: 'ยกเลิกการแจ้งเตือน:ลำดับรายการ'
-        }
-    };
-
-    protected addFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
+    protected addFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
         if(messages.length != 2) {
-            return lineBotClient.replyMessage(replyToken, `incorrect fotmat: ${this.actions.add.syntax}`);
+            return ;
         }
 
         const topic: string = messages[0].trim();
         const cronTime: string = messages[1].trim();
 
-        if(topic.length == 0) {
-            return lineBotClient.replyMessage(replyToken, 'incorrect fotmat: ชื่อการแจ้งเตือนต้องมีข้อมูล');
-        }
-
-        if(cronTime.length == 0 || cronTime.split(' ').length < 5) {
-            return lineBotClient.replyMessage(replyToken, 'incorrect fotmat: crontime ต้องมีข้อมูล');
+        if(topic.length == 0 || cronTime.length == 0 || cronTime.split(' ').length < 5) {
+            return;
         }
 
         if(!this.cronData[id]){
@@ -56,12 +36,11 @@ class ReminderHandler extends BaseHandler {
         this.jobs[id].push(job);
         this.isChange = true;
         return lineBotClient.replyMessage(replyToken, 'เพิ่มการแจ้งเตือนแล้ว');
-
     };
 
-    protected showFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
+    protected showFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         if(text.length != 0) {
-            return null;
+            return;
         }
 
         const list: NodeJS.Dict<ReminderData> = {};
@@ -75,12 +54,12 @@ class ReminderHandler extends BaseHandler {
 
     };
 
-    protected cancelFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
+    protected cancelFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
         const index: number = parseInt(messages[1]);
 
         if(messages.length != 2 || isNaN(index)) {
-            return lineBotClient.replyMessage(replyToken, `incorrect fotmat: ${this.actions.cancel.syntax}`);
+            return;
         }
 
         if(this.cronData[id]) {
@@ -92,16 +71,34 @@ class ReminderHandler extends BaseHandler {
         return lineBotClient.replyMessage(replyToken, 'ลบการแจ้งเตือนแล้ว');
     };
 
-    protected cronFn: CronFn = (id: string, data: ReminderData): CronCommand => {
+    protected cronFn: CronFn = (id: string, data: ReminderData) => {
         return () => {
             lineBotClient.pushSticker(id, '6325', '10979923');
             lineBotClient.pushMessage(id, 'ลืมอะไรหรือเปล่านะ');
 
             setTimeout(() => {
-                lineBotClient.pushMessage(id, `อย่าลืม${data.message}นะครับ`);
+                lineBotClient.pushMessage(id, `อย่าลืม${data.message}นะ`);
             }, 10000)
         }
     };
+
+    protected actions: Array<Action> = [
+        {
+            keyword: 'เพิ่มการแจ้งเตือน',
+            syntax: 'เพิ่มการแจ้งเตือน<ชื่อการแจ้งเตือน>:crontime',
+            fn: this.addFn,
+        },
+        {
+            keyword: 'แสดงการแจ้งเตือน',
+            syntax: 'แสดงการแจ้งเตือน',
+            fn: this.showFn,
+        },
+        {
+            keyword: 'ยกเลิกการแจ้งเตือน',
+            syntax: 'ยกเลิกการแจ้งเตือน:ลำดับรายการ',
+            fn: this.cancelFn,
+        }
+    ];
 }
 
 const instance: ReminderHandler = new ReminderHandler();

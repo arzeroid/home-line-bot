@@ -32,21 +32,11 @@ export interface DeviceDataResponse {
 
 export type CronData = ReminderData | ScraperData | DeviceData;
 
-export interface HandlerAction {
-    add: HandlerActionData;
-    show: HandlerActionData;
-    cancel: HandlerActionData;
-}
-
-export interface HandlerActionData {
-    keyword: string,
-    syntax: string
-}
-
 export type HandlerFn = (id: string, replyToken: string, text?: string) => Promise<line.MessageAPIResponseBase>;
+
 export type CronFn = (id: string, data: CronData) => CronCommand;
 
-export interface AdditionalAction {
+export interface Action {
     keyword: string,
     syntax: string,
     fn: HandlerFn,

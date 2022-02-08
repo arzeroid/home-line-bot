@@ -1,9 +1,8 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import cheerio, { Cheerio, CheerioAPI } from 'cheerio';
-import { CronCommand, CronJob } from 'cron';
-import { CronFn, HandlerAction, HandlerFn, ScraperData } from '../interfaces';
+import cheerio, { CheerioAPI } from 'cheerio';
+import { CronJob } from 'cron';
+import { Action, CronFn, HandlerFn, ScraperData } from '../interfaces';
 import { jsonStringify } from '../utils';
-import * as line from '@line/bot-sdk';
 import lineBotClient from '../line-bot-client';
 import { ScraperNotifyEnum } from '../enums';
 import BaseHandler from './base-handler';
@@ -13,25 +12,10 @@ class ScraperHandler extends BaseHandler{
     protected isCronData: boolean = true;
     protected filePath: string = process.env.SCRAPER_FILE;
 
-    protected actions: HandlerAction = {
-        add: {
-            keyword: 'monitor ',
-            syntax: 'monitor <url>$<element>$<EXISTS|NOT_EXISTS|VALUE>$<crontime>'
-        },
-        show: {
-            keyword: 'show monitor',
-            syntax: 'show monitor'
-        },
-        cancel: {
-            keyword: 'cancel monitor',
-            syntax: 'cancel monitor:ลำดับรายการ'
-        }
-    };
-
-    protected addFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
+    protected addFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split('$');
         if(messages.length != 4) {
-            return lineBotClient.replyMessage(replyToken, `incorrect fotmat: ${this.actions.add.syntax}`);
+            return;
         }
 
         const url: string = messages[0].trim();
@@ -39,20 +23,13 @@ class ScraperHandler extends BaseHandler{
         const notifyWhen: string = messages[2].trim();
         const cronTime: string = messages[3].trim();
 
-        if(url.length == 0) {
-            return lineBotClient.replyMessage(replyToken, 'incorrect fotmat: url ต้องมีข้อมูล');
-        }
-
-        if(element.length == 0) {
-            return lineBotClient.replyMessage(replyToken, 'incorrect fotmat: element ต้องมีข้อมูล');
-        }
-
-        if(ScraperNotifyEnum[notifyWhen] == undefined) {
-            return lineBotClient.replyMessage(replyToken, 'incorrect fotmat: notify_when ไม่ถูกต้อง');
-        }
-
-        if(cronTime.length == 0 || cronTime.split(' ').length < 5) {
-            return lineBotClient.replyMessage(replyToken, 'incorrect fotmat: crontime ต้องมีข้อมูล');
+        if(url.length == 0 ||
+            element.length == 0 ||
+            ScraperNotifyEnum[notifyWhen] == undefined ||
+            cronTime.length == 0 ||
+            cronTime.split(' ').length < 5
+        ) {
+            return;
         }
 
         if(!this.cronData[id]){
@@ -73,9 +50,9 @@ class ScraperHandler extends BaseHandler{
         return lineBotClient.replyMessage(replyToken, 'monitor success');
     };
 
-    protected showFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
+    protected showFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         if(text.length != 0) {
-            return null;
+            return;
         }
 
         const list: NodeJS.Dict<ScraperData> = {};
@@ -88,12 +65,12 @@ class ScraperHandler extends BaseHandler{
         return lineBotClient.replyMessage(replyToken, jsonStringify(list));
     };
 
-    protected cancelFn: HandlerFn = (id: string, replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
+    protected cancelFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
             const index: number = parseInt(messages[1]);
 
             if(messages.length != 2 || isNaN(index)) {
-                return lineBotClient.replyMessage(replyToken, `incorrect fotmat: ${this.actions.cancel.syntax}`);
+                return;
             }
 
             if(this.cronData[id]) {
@@ -105,7 +82,7 @@ class ScraperHandler extends BaseHandler{
             return lineBotClient.replyMessage(replyToken, 'cancel monitor success');
     };
 
-    protected cronFn: CronFn = (id: string, data: ScraperData): CronCommand => {
+    protected cronFn: CronFn = (id: string, data: ScraperData) => {
         const axiosInstance: AxiosInstance = this.axiosInstance;
         return async (): Promise<void> => {
 
@@ -137,6 +114,24 @@ class ScraperHandler extends BaseHandler{
             'Accept-Encoding': 'gzip, deflate, br'
         }
     });
+
+    protected actions: Array<Action> = [
+        {
+            keyword: 'monitor ',
+            syntax: 'monitor <url>$<element>$<EXISTS|NOT_EXISTS|VALUE>$<crontime>',
+            fn: this.addFn,
+        },
+        {
+            keyword: 'show monitor',
+            syntax: 'show monitor',
+            fn: this.showFn,
+        },
+        {
+            keyword: 'cancel monitor',
+            syntax: 'cancel monitor:ลำดับรายการ',
+            fn: this.cancelFn,
+        }
+    ];
 }
 
 const instance: ScraperHandler = new ScraperHandler();

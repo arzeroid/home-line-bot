@@ -1,7 +1,7 @@
 import * as line from '@line/bot-sdk';
 import { jsonStringify } from '../utils';
 import * as fs from 'fs';
-import { HandlerAction, CronData, CronFn, HandlerFn, AdditionalAction, HandlerActionData } from '../interfaces';
+import { CronData, CronFn, Action } from '../interfaces';
 import { CronJob } from 'cron';
 import lineBotClient from '../line-bot-client';
 
@@ -11,12 +11,8 @@ export default class BaseHandler {
     // must be init on inherit class
     protected filePath: string;
     protected isCronData: boolean;
-    protected actions: HandlerAction;
-    protected addFn: HandlerFn;
-    protected showFn: HandlerFn;
-    protected cancelFn: HandlerFn;
     protected cronFn: CronFn; // required if isCronData = true
-    protected additionalActions: Array<AdditionalAction> = [];
+    protected actions: Array<Action> = [];
 
     // variables when isCronData = false
     protected data: NodeJS.Dict<NodeJS.Dict<Array<string>>>;
@@ -66,42 +62,17 @@ export default class BaseHandler {
         if(text == 'แสดงคำสั่งทั้งหมด') {
             const syntaxList: Array<string> = [];
 
-            if(this.actions) {
-                for(let key of Object.keys(this.actions)){
-                    const handlerData: HandlerActionData= this.actions[key];
-                    syntaxList.push(handlerData.syntax);
-                }
-            }
-
-            for(let action of this.additionalActions){
+            for(let action of this.actions){
                 syntaxList.push(action.syntax);
             }
 
             return lineBotClient.pushMessage(id, jsonStringify(syntaxList));
         }
 
-        if(this.actions && text.startsWith(this.actions.add.keyword)) {
-            text = text.substring(this.actions.add.keyword.length);
-
-            try {
-                return this.addFn(id, replyToken, text);
-            }
-            catch(ex) {
-                return lineBotClient.replyMessage(replyToken, (<Error> ex).message);
-            }
-        }
-        else if(this.actions && text.startsWith(this.actions.show.keyword)) {
-            text = text.substring(this.actions.show.keyword.length);
-            return this.showFn(id, replyToken, text);
-        }
-        else if(this.actions && text.startsWith(this.actions.cancel.keyword)) {
-            text = text.substring(this.actions.cancel.keyword.length);
-            return this.cancelFn(id, replyToken, text);
-        }
-
-        this.additionalActions.forEach(element => {
-            if(text == element.keyword) {
-                return element.fn(id, replyToken);
+        this.actions.forEach(element => {
+            if(text.startsWith(element.keyword)) {
+                text = text.substring(element.keyword.length);
+                return element.fn(id, replyToken, text);
             }
         });
     }
