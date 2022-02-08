@@ -28,6 +28,10 @@ class MemoryHandler extends BaseHandler {
             return lineBotClient.replyMessage(replyToken, 'ไม่พบหัวข้อรายการที่ระบุ');
         }
 
+        if(this.data[id][key].length > 0) {
+            return lineBotClient.replyMessage(replyToken, 'ไม่สามารถลบหัวข้อรายการที่ไม่ว่างได้');
+        }
+
         delete this.data[id][key];
         this.isChange = true;
         return lineBotClient.replyMessage(replyToken, 'ลบหัวข้อรายการเรียบร้อย');
@@ -97,8 +101,8 @@ class MemoryHandler extends BaseHandler {
 
     protected actions: Array<Action> = [
         {
-            keyword: 'แสดงหัวข้อรายการทั้งหมด',
-            syntax: 'แสดงหัวข้อรายการทั้งหมด',
+            keyword: 'แสดงหัวข้อรายการ',
+            syntax: 'แสดงหัวข้อรายการ',
             fn: this.viewAllTopicFn,
         },
         {
