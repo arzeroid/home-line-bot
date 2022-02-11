@@ -74,13 +74,13 @@ const HTTP_MODE: string = process.env.HTTP_MODE;
 const CERT_PATH: string = process.env.CERT_PATH;
 
 // Starting both http & https servers
-if(HTTP_MODE == 'HTTP'){
-    const httpServer: http.Server = http.createServer(app);
-    httpServer.listen(80, () => {
-        console.log('HTTP Server running on port 80');
-    });
-}
-else if(HTTP_MODE == 'HTTPS') {
+
+const httpServer: http.Server = http.createServer(app);
+httpServer.listen(80, () => {
+    console.log('HTTP Server running on port 80');
+});
+
+if(HTTP_MODE == 'HTTPS') {
     // Certificate
     const privateKey: string = fs.readFileSync(`${CERT_PATH}/privkey.pem`, 'utf8');
     const certificate: string = fs.readFileSync(`${CERT_PATH}/cert.pem`, 'utf8');
