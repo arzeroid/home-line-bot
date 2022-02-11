@@ -12,11 +12,40 @@ import reminderHandler from './handlers/reminder-handler';
 import memoryHandler from './handlers/memory-handler';
 import scraperHandler from './handlers/scraper-handler';
 import BaseHandler from './handlers/base-handler';
+import { DeviceData } from './interfaces';
+import * as moment from 'moment';
+import * as bodyParser from 'body-parser';
 
 const app: Express = express();
+app.use(bodyParser.json());
+
+let lastReqTime: moment.Moment = moment();
+const bufferMin: number = 3;
 
 app.get('/', (req, res) => {
 	res.send('Hello there !!!');
+});
+
+app.post('/devices', (req, res) => {
+    const body: DeviceData = req.body;
+    console.log(body);
+
+    if(body.userId != process.env.ADMIN_ID){
+        return res.status(403).send({
+            message: 'Access Forbidden'
+        });
+    }
+
+    body.data.forEach(msg => lineBotClient.pushMessage(body.userId, msg));
+    lastReqTime = moment();
+
+    setTimeout(() => {
+        if(moment().diff(lastReqTime, 'minutes') > parseInt(process.env.WAIT_TIMEOUT_MIN)){
+            lineBotClient.pushMessage(body.userId, 'Local server is down');
+        }
+    }, parseInt(process.env.WAIT_TIMEOUT_MIN) + bufferMin  * 60000);
+
+    return res.send('OK');
 });
 
 app.post('/webhook', line.middleware(lineBotClient.config), (req, res) => {
