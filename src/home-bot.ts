@@ -17,7 +17,6 @@ import * as moment from 'moment';
 import * as bodyParser from 'body-parser';
 
 const app: Express = express();
-app.use(bodyParser.json());
 
 let lastReqTime: moment.Moment = moment();
 const bufferMin: number = 3;
@@ -26,7 +25,7 @@ app.get('/', (req, res) => {
 	res.send('Hello there !!!');
 });
 
-app.post('/devices', (req, res) => {
+app.post('/devices', bodyParser.json(), (req, res) => {
     const body: DeviceData = req.body;
     console.log(body);
 
