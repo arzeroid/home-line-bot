@@ -19,7 +19,7 @@ import * as bodyParser from 'body-parser';
 const app: Express = express();
 
 let lastReqTime: moment.Moment = moment();
-const bufferMin: number = 3;
+const bufferMin: number = 1;
 
 app.get('/', (req, res) => {
 	res.send('Hello there !!!');
@@ -39,10 +39,12 @@ app.post('/devices', bodyParser.json(), (req, res) => {
     lastReqTime = moment();
 
     setTimeout(() => {
+        console.log(body.userId);
+        console.log(moment().diff(lastReqTime, 'minutes'));
         if(moment().diff(lastReqTime, 'minutes') > parseInt(process.env.WAIT_TIMEOUT_MIN)){
             lineBotClient.pushMessage(body.userId, 'Local server is down');
         }
-    }, parseInt(process.env.WAIT_TIMEOUT_MIN) + bufferMin  * 60000);
+    }, (parseInt(process.env.WAIT_TIMEOUT_MIN) + bufferMin)  * 60000);
 
     return res.send('OK');
 });
