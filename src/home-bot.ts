@@ -15,6 +15,7 @@ import BaseHandler from './handlers/base-handler';
 import { DeviceData } from './interfaces';
 import * as moment from 'moment';
 import * as bodyParser from 'body-parser';
+import lineNotify from './line-notify';
 
 const app: Express = express();
 
@@ -35,14 +36,14 @@ app.post('/devices', bodyParser.json(), (req, res) => {
         });
     }
 
-    body.data.forEach(msg => lineBotClient.pushMessage(body.userId, msg));
+    body.data.forEach(msg => lineNotify.sendMessage(msg));
     lastReqTime = moment();
 
     setTimeout(() => {
         console.log(body.userId);
         console.log(moment().diff(lastReqTime, 'minutes'));
         if(moment().diff(lastReqTime, 'minutes') > parseInt(process.env.WAIT_TIMEOUT_MIN)){
-            lineBotClient.pushMessage(body.userId, 'Local server is down');
+            lineNotify.sendMessage('Local server is down');
         }
     }, (parseInt(process.env.WAIT_TIMEOUT_MIN) + bufferMin)  * 60000);
 

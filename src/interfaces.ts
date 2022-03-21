@@ -30,3 +30,8 @@ export interface DeviceData {
     userId: string,
     data: Array<string>
 }
+
+export interface LineNotifyResponse {
+    status: number;
+    message: string;
+}
