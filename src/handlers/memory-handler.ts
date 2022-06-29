@@ -39,12 +39,12 @@ class MemoryHandler extends BaseHandler {
 
     protected addFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
-            if(messages.length != 2) {
+            if(messages.length <= 2) {
                 return;
             }
 
             const key: string = messages[0].trim();
-            const description: string = messages[1].trim();
+            const description: string = messages.slice(1).join(':').trim();
             if(key.length == 0 || description.length == 0) {
                 return;
             }
