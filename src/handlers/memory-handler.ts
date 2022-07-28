@@ -39,27 +39,27 @@ class MemoryHandler extends BaseHandler {
 
     protected addFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
-            if(messages.length <= 2) {
-                return;
-            }
+        if(messages.length <= 2) {
+            return;
+        }
 
-            const key: string = messages[0].trim();
-            const description: string = messages.slice(1).join(':').trim();
-            if(key.length == 0 || description.length == 0) {
-                return;
-            }
+        const key: string = messages[0].trim();
+        const description: string = messages.slice(1).join(':').trim();
+        if(key.length == 0 || description.length == 0) {
+            return;
+        }
 
-            if(!this.data[id]){
-                this.data[id] = {};
-            }
+        if(!this.data[id]){
+            this.data[id] = {};
+        }
 
-            if(!this.data[id][key]){
-                this.data[id][key] = [];
-            }
+        if(!this.data[id][key]){
+            this.data[id][key] = [];
+        }
 
-            this.data[id][key].push(description);
-            this.isChange = true;
-            return lineBotClient.replyMessage(replyToken, 'บันทึกเรียบร้อย');
+        this.data[id][key].push(description);
+        this.isChange = true;
+        return lineBotClient.replyMessage(replyToken, 'บันทึกเรียบร้อย');
     };
 
     protected showFn: HandlerFn = (id: string, replyToken: string, text: string) => {
