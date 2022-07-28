@@ -25,16 +25,16 @@ class MemoryHandler extends BaseHandler {
         const key: string = messages[1].trim();
 
         if(!this.data[id] || !this.data[id][key]) {
-            return lineBotClient.replyMessage(replyToken, 'ไม่พบหัวข้อรายการที่ระบุ');
+            return lineBotClient.replyMessage(replyToken, 'ไม่พบชื่อรายการที่ระบุ');
         }
 
         if(this.data[id][key].length > 0) {
-            return lineBotClient.replyMessage(replyToken, 'ไม่สามารถลบหัวข้อรายการที่ไม่ว่างได้');
+            return lineBotClient.replyMessage(replyToken, 'ไม่สามารถลบชื่อรายการที่ไม่ว่างได้');
         }
 
         delete this.data[id][key];
         this.isChange = true;
-        return lineBotClient.replyMessage(replyToken, 'ลบหัวข้อรายการเรียบร้อย');
+        return lineBotClient.replyMessage(replyToken, 'ลบชื่อรายการเรียบร้อย');
     }
 
     protected addFn: HandlerFn = (id: string, replyToken: string, text: string) => {
@@ -101,13 +101,13 @@ class MemoryHandler extends BaseHandler {
 
     protected actions: Array<Action> = [
         {
-            keyword: 'แสดงหัวข้อรายการ',
-            syntax: 'แสดงหัวข้อรายการ',
+            keyword: 'แสดงชื่อรายการ',
+            syntax: 'แสดงชื่อรายการ',
             fn: this.viewAllTopicFn,
         },
         {
-            keyword: 'ลบหัวข้อรายการ',
-            syntax: 'ลบหัวข้อรายการ:ชื่อหัวข้อรายการ',
+            keyword: 'ลบชื่อรายการ',
+            syntax: 'ลบชื่อรายการ:ชื่อรายการ',
             fn: this.deleteTopicFn,
         },
         {
