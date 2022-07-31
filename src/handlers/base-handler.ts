@@ -71,7 +71,9 @@ export default class BaseHandler {
 
         this.actions.forEach(element => {
             if(text.startsWith(element.keyword)) {
+                console.log("startsWith:" + element.keyword);
                 text = text.substring(element.keyword.length);
+                console.log(text);
                 return element.fn(id, replyToken, text);
             }
         });
