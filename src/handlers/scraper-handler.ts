@@ -10,12 +10,13 @@ import BaseHandler from './base-handler';
 class ScraperHandler extends BaseHandler{
 
     protected isCronData: boolean = true;
+    protected handlerName: string = 'ScraperHandler';
     protected filePath: string = process.env.SCRAPER_FILE;
 
     protected addFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split('$');
         if(messages.length != 4) {
-            return;
+            return this.replyIncorrectSyntax(replyToken);
         }
 
         const url: string = messages[0].trim();
@@ -29,7 +30,7 @@ class ScraperHandler extends BaseHandler{
             cronTime.length == 0 ||
             cronTime.split(' ').length < 5
         ) {
-            return;
+            return this.replyIncorrectSyntax(replyToken);
         }
 
         if(!this.cronData[id]){
@@ -52,7 +53,7 @@ class ScraperHandler extends BaseHandler{
 
     protected showFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         if(text.length != 0) {
-            return;
+            return this.replyIncorrectSyntax(replyToken);
         }
 
         const list: NodeJS.Dict<ScraperData> = {};
@@ -70,7 +71,7 @@ class ScraperHandler extends BaseHandler{
             const index: number = parseInt(messages[1]);
 
             if(messages.length != 2 || isNaN(index)) {
-                return;
+                return this.replyIncorrectSyntax(replyToken);
             }
 
             if(this.cronData[id]) {

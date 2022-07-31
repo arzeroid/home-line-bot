@@ -6,11 +6,12 @@ import { Action, HandlerFn } from '../interfaces';
 class MemoryHandler extends BaseHandler {
 
     protected isCronData: boolean = false;
+    protected handlerName: string= 'MemoryHandler';
     protected filePath: string = process.env.MEMORY_FILE;
 
     protected viewAllTopicFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         if(text.length > 0) {
-            return;
+            return this.replyIncorrectSyntax(replyToken);
         }
 
         return lineBotClient.replyMessage(replyToken, jsonStringify(Object.keys(this.data[id])));
@@ -19,7 +20,7 @@ class MemoryHandler extends BaseHandler {
     protected deleteTopicFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
         if(messages.length != 2) {
-            return ;
+            return this.replyIncorrectSyntax(replyToken);
         }
 
         const key: string = messages[1].trim();
@@ -39,14 +40,14 @@ class MemoryHandler extends BaseHandler {
 
     protected addFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
-        if(messages.length <= 2) {
-            return;
+        if(messages.length < 2) {
+            return this.replyIncorrectSyntax(replyToken);
         }
 
         const key: string = messages[0].trim();
         const description: string = messages.slice(1).join(':').trim();
         if(key.length == 0 || description.length == 0) {
-            return;
+            return this.replyIncorrectSyntax(replyToken);
         }
 
         if(!this.data[id]){
@@ -65,7 +66,7 @@ class MemoryHandler extends BaseHandler {
     protected showFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         const key: string = text;
         if(key.length == 0) {
-            return;
+            return this.replyIncorrectSyntax(replyToken);
         }
 
         if(!this.data[id] || !this.data[id][key]){
@@ -87,7 +88,7 @@ class MemoryHandler extends BaseHandler {
         const index: number = parseInt(messages[1]);
 
         if(messages.length != 2 || isNaN(index)) {
-            return;
+            return this.replyIncorrectSyntax(replyToken);
         }
 
         if(!this.data[id] || !this.data[id][key]) {

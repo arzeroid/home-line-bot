@@ -7,19 +7,20 @@ import BaseHandler from './base-handler';
 class ReminderHandler extends BaseHandler {
 
     protected isCronData: boolean = true;
+    protected handlerName: string = 'ReminderHandler';
     protected filePath: string = process.env.REMINDER_FILE;
 
     protected addFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
         if(messages.length != 2) {
-            return ;
+            return this.replyIncorrectSyntax(replyToken);
         }
 
         const topic: string = messages[0].trim();
         const cronTime: string = messages[1].trim();
 
         if(topic.length == 0 || cronTime.length == 0 || cronTime.split(' ').length < 5) {
-            return;
+            return this.replyIncorrectSyntax(replyToken);
         }
 
         if(!this.cronData[id]){
@@ -40,7 +41,7 @@ class ReminderHandler extends BaseHandler {
 
     protected showFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         if(text.length != 0) {
-            return;
+            return this.replyIncorrectSyntax(replyToken);
         }
 
         const list: NodeJS.Dict<ReminderData> = {};
@@ -59,7 +60,7 @@ class ReminderHandler extends BaseHandler {
         const index: number = parseInt(messages[1]);
 
         if(messages.length != 2 || isNaN(index)) {
-            return;
+            return this.replyIncorrectSyntax(replyToken);
         }
 
         if(this.cronData[id]) {

@@ -9,6 +9,7 @@ export default class BaseHandler {
     protected isChange: boolean = false;
 
     // must be init on inherit class
+    protected handlerName: string;
     protected filePath: string;
     protected isCronData: boolean;
     protected cronFn: CronFn; // required if isCronData = true
@@ -96,5 +97,9 @@ export default class BaseHandler {
             this.isChange = false;
         }
         setTimeout(this.writeFile, 5000)
+    }
+
+    protected replyIncorrectSyntax = (replyToken: string): Promise<line.MessageAPIResponseBase> => {
+        return lineBotClient.replyMessage(replyToken, this.handlerName + ': Incorrect syntax');
     }
 }
