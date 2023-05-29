@@ -48,7 +48,7 @@ export default class BaseHandler {
         const source: line.EventSource = event.source;
         let id: string = null;
 
-        console.log(jsonStringify(event));
+        // console.log(jsonStringify(event));
 
         if (source.type == 'user') {
             id = source.userId;
