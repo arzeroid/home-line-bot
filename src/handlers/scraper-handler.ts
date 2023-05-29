@@ -7,7 +7,7 @@ import lineBotClient from '../line-bot-client';
 import { ScraperNotifyEnum } from '../enums';
 import BaseHandler from './base-handler';
 
-class ScraperHandler extends BaseHandler{
+class ScraperHandler extends BaseHandler {
 
     protected isCronData: boolean = true;
     protected handlerName: string = 'ScraperHandler';
@@ -15,7 +15,7 @@ class ScraperHandler extends BaseHandler{
 
     protected addFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split('$');
-        if(messages.length != 4) {
+        if (messages.length != 4) {
             return this.replyIncorrectSyntax(replyToken);
         }
 
@@ -24,7 +24,7 @@ class ScraperHandler extends BaseHandler{
         const notifyWhen: string = messages[2].trim();
         const cronTime: string = messages[3].trim();
 
-        if(url.length == 0 ||
+        if (url.length == 0 ||
             element.length == 0 ||
             ScraperNotifyEnum[notifyWhen] == undefined ||
             cronTime.length == 0 ||
@@ -33,7 +33,7 @@ class ScraperHandler extends BaseHandler{
             return this.replyIncorrectSyntax(replyToken);
         }
 
-        if(!this.cronData[id]){
+        if (!this.cronData[id]) {
             this.cronData[id] = [];
             this.jobs[id] = [];
         }
@@ -52,14 +52,14 @@ class ScraperHandler extends BaseHandler{
     };
 
     protected showFn: HandlerFn = (id: string, replyToken: string, text: string) => {
-        if(text.length != 0) {
+        if (text.length != 0) {
             return this.replyIncorrectSyntax(replyToken);
         }
 
         const list: NodeJS.Dict<ScraperData> = {};
-        if(this.cronData[id]){
-            const messages: Array<ScraperData> = <Array<ScraperData>> this.cronData[id];
-            for(let index in messages){
+        if (this.cronData[id]) {
+            const messages: Array<ScraperData> = <Array<ScraperData>>this.cronData[id];
+            for (let index in messages) {
                 list[`${index}`] = messages[index];
             }
         }
@@ -68,19 +68,19 @@ class ScraperHandler extends BaseHandler{
 
     protected cancelFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
-            const index: number = parseInt(messages[1]);
+        const index: number = parseInt(messages[1]);
 
-            if(messages.length != 2 || isNaN(index)) {
-                return this.replyIncorrectSyntax(replyToken);
-            }
+        if (messages.length != 2 || isNaN(index)) {
+            return this.replyIncorrectSyntax(replyToken);
+        }
 
-            if(this.cronData[id]) {
-                this.cronData[id].splice(index, 1);
-                this.jobs[id][index].stop();
-                this.jobs[id].splice(index, 1);
-                this.isChange = true;
-            }
-            return lineBotClient.replyMessage(replyToken, 'cancel monitor success');
+        if (this.cronData[id]) {
+            this.cronData[id].splice(index, 1);
+            this.jobs[id][index].stop();
+            this.jobs[id].splice(index, 1);
+            this.isChange = true;
+        }
+        return lineBotClient.replyMessage(replyToken, 'cancel monitor success');
     };
 
     protected cronFn: CronFn = (id: string, data: ScraperData) => {
@@ -88,16 +88,16 @@ class ScraperHandler extends BaseHandler{
         return async (): Promise<void> => {
 
             const response: AxiosResponse<any> = await axiosInstance.get(data.url);
-            const $:CheerioAPI = cheerio.load(response.data);
+            const $: CheerioAPI = cheerio.load(response.data);
 
-            switch(data.notifyWhen) {
+            switch (data.notifyWhen) {
                 case ScraperNotifyEnum.EXISTS:
-                    if($(data.element).text() != undefined){
+                    if ($(data.element).text() != undefined) {
                         lineBotClient.pushMessage(id, `พบ ${data.element} ใน ${data.url} แล้ว`);
                     }
                     break;
                 case ScraperNotifyEnum.NOT_EXISTS:
-                    if($(data.element).text() == undefined){
+                    if ($(data.element).text() == undefined) {
                         lineBotClient.pushMessage(id, `ไม่พบ ${data.element} ใน ${data.url} แล้ว`);
                     }
                     break;

@@ -11,9 +11,10 @@ import lineBotClient from './line-bot-client';
 import reminderHandler from './handlers/reminder-handler';
 import memoryHandler from './handlers/memory-handler';
 import scraperHandler from './handlers/scraper-handler';
+import contentHandler from './handlers/content-handler';
 import BaseHandler from './handlers/base-handler';
 import { jsonStringify } from './utils';
-import { Readable } from 'stream';
+
 
 const app: Express = express();
 
@@ -29,7 +30,7 @@ app.post('/webhook', line.middleware(lineBotClient.config), (req, res) => {
 
 function handleEvent(event: line.WebhookEvent) {
 
-    console.log(jsonStringify(event));
+    // console.log(jsonStringify(event));
 
     if (event.type !== 'message') {
         return Promise.resolve(null);
@@ -47,85 +48,7 @@ function handleEvent(event: line.WebhookEvent) {
         return Promise.all(promises);
     }
 
-    if (event.message.type == 'image') {
-        const source: line.EventSource = event.source;
-        let id: string = null;
-        if (source.type == 'user') {
-            id = source.userId;
-        }
-        else if (source.type == 'group') {
-            id = source.groupId;
-        }
-
-        const ws: fs.WriteStream = fs.createWriteStream(`img/${event.message.id}.jpg`);
-        lineBotClient.getMessageContent(event.message.id).then((data: Readable) => {
-            data.pipe(ws);
-            data.on('end', () => {
-                lineBotClient.pushMessage(id, 'image save');
-                ws.close();
-            })
-        })
-    }
-
-    if (event.message.type == 'video') {
-        const source: line.EventSource = event.source;
-        let id: string = null;
-        if (source.type == 'user') {
-            id = source.userId;
-        }
-        else if (source.type == 'group') {
-            id = source.groupId;
-        }
-
-        const ws: fs.WriteStream = fs.createWriteStream(`vdo/${event.message.id}.mp4`);
-        lineBotClient.getMessageContent(event.message.id).then((data: Readable) => {
-            data.pipe(ws);
-            data.on('end', () => {
-                lineBotClient.pushMessage(id, 'video save');
-                ws.close();
-            })
-        })
-    }
-
-    if (event.message.type == 'audio') {
-        const source: line.EventSource = event.source;
-        let id: string = null;
-        if (source.type == 'user') {
-            id = source.userId;
-        }
-        else if (source.type == 'group') {
-            id = source.groupId;
-        }
-
-        const ws: fs.WriteStream = fs.createWriteStream(`audio/${event.message.id}.m4a`);
-        lineBotClient.getMessageContent(event.message.id).then((data: Readable) => {
-            data.pipe(ws);
-            data.on('end', () => {
-                lineBotClient.pushMessage(id, 'audio save');
-                ws.close();
-            })
-        })
-    }
-
-    if (event.message.type == 'file') {
-        const source: line.EventSource = event.source;
-        let id: string = null;
-        if (source.type == 'user') {
-            id = source.userId;
-        }
-        else if (source.type == 'group') {
-            id = source.groupId;
-        }
-
-        const ws: fs.WriteStream = fs.createWriteStream(`files/${event.message.fileName}`);
-        lineBotClient.getMessageContent(event.message.id).then((data: Readable) => {
-            data.pipe(ws);
-            data.on('end', () => {
-                lineBotClient.pushMessage(id, 'file save');
-                ws.close();
-            })
-        })
-    }
+    return contentHandler.handle(event);
 }
 
 const HTTP_MODE: string = process.env.HTTP_MODE;
