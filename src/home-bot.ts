@@ -86,6 +86,46 @@ function handleEvent(event: line.WebhookEvent) {
             })
         })
     }
+
+    if (event.message.type == 'audio') {
+        const source: line.EventSource = event.source;
+        let id: string = null;
+        if (source.type == 'user') {
+            id = source.userId;
+        }
+        else if (source.type == 'group') {
+            id = source.groupId;
+        }
+
+        const ws: fs.WriteStream = fs.createWriteStream(`audio/${event.message.id}.m4a`);
+        lineBotClient.getMessageContent(event.message.id).then((data: Readable) => {
+            data.pipe(ws);
+            data.on('end', () => {
+                lineBotClient.pushMessage(id, 'audio save');
+                ws.close();
+            })
+        })
+    }
+
+    if (event.message.type == 'file') {
+        const source: line.EventSource = event.source;
+        let id: string = null;
+        if (source.type == 'user') {
+            id = source.userId;
+        }
+        else if (source.type == 'group') {
+            id = source.groupId;
+        }
+
+        const ws: fs.WriteStream = fs.createWriteStream(`files/${event.message.fileName}`);
+        lineBotClient.getMessageContent(event.message.id).then((data: Readable) => {
+            data.pipe(ws);
+            data.on('end', () => {
+                lineBotClient.pushMessage(id, 'file save');
+                ws.close();
+            })
+        })
+    }
 }
 
 const HTTP_MODE: string = process.env.HTTP_MODE;

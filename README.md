@@ -1,2 +1,4 @@
 # home-line-bot
-Task and buying list management
+mkdir img
+mkdir vdo
+mkdir files
