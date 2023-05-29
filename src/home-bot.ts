@@ -57,11 +57,31 @@ function handleEvent(event: line.WebhookEvent) {
             id = source.groupId;
         }
 
-        const ws: fs.WriteStream = fs.createWriteStream('img/' + event.message.id + '.jpg');
+        const ws: fs.WriteStream = fs.createWriteStream(`img/${event.message.id}.jpg`);
         lineBotClient.getMessageContent(event.message.id).then((data: Readable) => {
             data.pipe(ws);
             data.on('end', () => {
                 lineBotClient.pushMessage(id, 'image save');
+                ws.close();
+            })
+        })
+    }
+
+    if (event.message.type == 'video') {
+        const source: line.EventSource = event.source;
+        let id: string = null;
+        if (source.type == 'user') {
+            id = source.userId;
+        }
+        else if (source.type == 'group') {
+            id = source.groupId;
+        }
+
+        const ws: fs.WriteStream = fs.createWriteStream(`vdo/${event.message.id}.mp4`);
+        lineBotClient.getMessageContent(event.message.id).then((data: Readable) => {
+            data.pipe(ws);
+            data.on('end', () => {
+                lineBotClient.pushMessage(id, 'video save');
                 ws.close();
             })
         })
@@ -80,9 +100,9 @@ httpServer.listen(80, () => {
 
 if (HTTP_MODE == 'HTTPS') {
     // Certificate
-    const privateKey: string = fs.readFileSync(`${CERT_PATH}/privkey.pem`, 'utf8');
-    const certificate: string = fs.readFileSync(`${CERT_PATH}/cert.pem`, 'utf8');
-    const ca: string = fs.readFileSync(`${CERT_PATH}/chain.pem`, 'utf8');
+    const privateKey: string = fs.readFileSync(`${CERT_PATH} / privkey.pem`, 'utf8');
+    const certificate: string = fs.readFileSync(`${CERT_PATH} / cert.pem`, 'utf8');
+    const ca: string = fs.readFileSync(`${CERT_PATH} / chain.pem`, 'utf8');
 
     const credentials: SecureContextOptions = {
         key: privateKey,
