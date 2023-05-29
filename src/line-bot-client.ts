@@ -1,4 +1,5 @@
 import * as line from '@line/bot-sdk';
+import { Readable } from "stream";
 
 class LineBotClient {
     public config: line.MiddlewareConfig & line.ClientConfig = {
@@ -27,6 +28,10 @@ class LineBotClient {
             packageId: packageId,
             stickerId: stickerId
         });
+    }
+
+    public getMessageContent = (messageId: string): Promise<Readable> => {
+        return this.client.getMessageContent(messageId);
     }
 }
 

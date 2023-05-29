@@ -30,19 +30,30 @@ function handleEvent(event: line.WebhookEvent) {
 
     console.log(jsonStringify(event));
 
-    if (event.type !== 'message' || (event.message.type !== 'text')) {
+    if (event.type !== 'message') {
         return Promise.resolve(null);
     }
 
-    const handlers: Array<BaseHandler> = [
-        memoryHandler,
-        reminderHandler,
-        scraperHandler
-    ];
+    if (event.message.type == 'text') {
+        const handlers: Array<BaseHandler> = [
+            memoryHandler,
+            reminderHandler,
+            scraperHandler
+        ];
 
-    const promises: Array<Promise<line.MessageAPIResponseBase>> = handlers.map(handler => handler.handle(event));
+        const promises: Array<Promise<line.MessageAPIResponseBase>> = handlers.map(handler => handler.handle(event));
 
-    return Promise.all(promises);
+        return Promise.all(promises);
+    }
+
+    if (event.message.type == 'image') {
+        const file = lineBotClient.getMessageContent(event.message.id);
+        const ws = fs.createWriteStream('sample.jpg');
+        file.then((data) => {
+            data.pipe(ws);
+        })
+    }
+
 }
 
 const HTTP_MODE: string = process.env.HTTP_MODE;
