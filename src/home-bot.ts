@@ -48,7 +48,9 @@ function handleEvent(event: line.WebhookEvent) {
         return Promise.all(promises);
     }
 
-    return contentHandler.handle(event);
+    if (event.source.userId == process.env.ADMIN_ID) {
+        return contentHandler.handle(event);
+    }
 }
 
 const HTTP_MODE: string = process.env.HTTP_MODE;
