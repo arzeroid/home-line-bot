@@ -4,50 +4,19 @@ import * as fs from 'fs';
 import * as http from 'http';
 import * as https from 'https';
 import * as express from 'express';
-import {Express} from 'express-serve-static-core';
-import {SecureContextOptions} from 'node:tls';
+import { Express } from 'express-serve-static-core';
+import { SecureContextOptions } from 'node:tls';
 import * as line from '@line/bot-sdk';
 import lineBotClient from './line-bot-client';
 import reminderHandler from './handlers/reminder-handler';
 import memoryHandler from './handlers/memory-handler';
 import scraperHandler from './handlers/scraper-handler';
 import BaseHandler from './handlers/base-handler';
-import { DeviceData } from './interfaces';
-import * as moment from 'moment';
-import * as bodyParser from 'body-parser';
-import lineNotify from './line-notify';
 
 const app: Express = express();
 
-let lastReqTime: moment.Moment = moment();
-const bufferMin: number = 1;
-
 app.get('/', (req, res) => {
-	res.send('Hello there !!!');
-});
-
-app.post('/devices', bodyParser.json(), (req, res) => {
-    const body: DeviceData = req.body;
-    console.log(body);
-
-    if(body.userId != process.env.ADMIN_ID){
-        return res.status(403).send({
-            message: 'Access Forbidden'
-        });
-    }
-
-    body.data.forEach(msg => lineNotify.sendMessage(msg));
-    lastReqTime = moment();
-
-    setTimeout(() => {
-        console.log(body.userId);
-        console.log(moment().diff(lastReqTime, 'minutes'));
-        if(moment().diff(lastReqTime, 'minutes') > parseInt(process.env.WAIT_TIMEOUT_MIN)){
-            lineNotify.sendMessage('Local server is down');
-        }
-    }, (parseInt(process.env.WAIT_TIMEOUT_MIN) + bufferMin)  * 60000);
-
-    return res.send('OK');
+    res.send('Hello there !!!');
 });
 
 app.post('/webhook', line.middleware(lineBotClient.config), (req, res) => {
@@ -83,7 +52,7 @@ httpServer.listen(80, () => {
     console.log('HTTP Server running on port 80');
 });
 
-if(HTTP_MODE == 'HTTPS') {
+if (HTTP_MODE == 'HTTPS') {
     // Certificate
     const privateKey: string = fs.readFileSync(`${CERT_PATH}/privkey.pem`, 'utf8');
     const certificate: string = fs.readFileSync(`${CERT_PATH}/cert.pem`, 'utf8');

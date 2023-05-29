@@ -23,15 +23,15 @@ export default class BaseHandler {
     protected jobs: NodeJS.Dict<Array<CronJob>> = {};
 
     public setup = (): void => {
-        const rawData: string = fs.readFileSync(this.filePath, {encoding: 'utf8'});
+        const rawData: string = fs.readFileSync(this.filePath, { encoding: 'utf8' });
 
-        if(this.isCronData){
+        if (this.isCronData) {
             this.cronData = JSON.parse(rawData);
 
             for (const id in this.cronData) {
-                const data: Array<CronData> = <Array<CronData>> this.cronData[id];
+                const data: Array<CronData> = <Array<CronData>>this.cronData[id];
                 this.jobs[id] = [];
-                for(const d of data){
+                for (const d of data) {
                     const job: CronJob = this.createNewCronJob(id, d);
                     this.jobs[id].push(job);
                 }
@@ -48,22 +48,22 @@ export default class BaseHandler {
         const source: line.EventSource = event.source;
         let id: string = null;
 
-        // console.log(jsonStringify(event));
+        console.log(jsonStringify(event));
 
-        if(source.type == 'user') {
+        if (source.type == 'user') {
             id = source.userId;
         }
-        else if(source.type == 'group') {
+        else if (source.type == 'group') {
             id = source.groupId;
         }
 
-        let message: line.TextEventMessage = <line.TextEventMessage> event.message;
+        let message: line.TextEventMessage = <line.TextEventMessage>event.message;
         let text: string = message.text;
 
-        if(text == 'แสดงคำสั่งทั้งหมด') {
+        if (text == 'แสดงคำสั่งทั้งหมด') {
             const syntaxList: Array<string> = [];
 
-            for(let action of this.actions){
+            for (let action of this.actions) {
                 syntaxList.push(action.syntax);
             }
 
@@ -71,7 +71,7 @@ export default class BaseHandler {
         }
 
         this.actions.forEach(element => {
-            if(text.startsWith(element.keyword)) {
+            if (text.startsWith(element.keyword)) {
                 text = text.substring(element.keyword.length);
                 console.log(`${this.handlerName} ${element.keyword} ${text}`);
                 return element.fn(id, replyToken, text);
@@ -84,8 +84,8 @@ export default class BaseHandler {
     }
 
     protected writeFile = (): void => {
-        if(this.isChange){
-            if(this.isCronData){
+        if (this.isChange) {
+            if (this.isCronData) {
                 fs.writeFileSync(this.filePath, jsonStringify(this.cronData));
             }
             else {
