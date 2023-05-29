@@ -67,25 +67,25 @@ function handleEvent(event: line.WebhookEvent) {
         })
     }
 
-    if (event.message.type == 'video') {
-        const source: line.EventSource = event.source;
-        let id: string = null;
-        if (source.type == 'user') {
-            id = source.userId;
-        }
-        else if (source.type == 'group') {
-            id = source.groupId;
-        }
+    // if (event.message.type == 'video') {
+    //     const source: line.EventSource = event.source;
+    //     let id: string = null;
+    //     if (source.type == 'user') {
+    //         id = source.userId;
+    //     }
+    //     else if (source.type == 'group') {
+    //         id = source.groupId;
+    //     }
 
-        const ws: fs.WriteStream = fs.createWriteStream(`vdo/${event.message.id}.mp4`);
-        lineBotClient.getMessageContent(event.message.id).then((data: Readable) => {
-            data.pipe(ws);
-            data.on('end', () => {
-                lineBotClient.pushMessage(id, 'video save');
-                ws.close();
-            })
-        })
-    }
+    //     const ws: fs.WriteStream = fs.createWriteStream(`vdo/${event.message.id}.mp4`);
+    //     lineBotClient.getMessageContent(event.message.id).then((data: Readable) => {
+    //         data.pipe(ws);
+    //         data.on('end', () => {
+    //             lineBotClient.pushMessage(id, 'video save');
+    //             ws.close();
+    //         })
+    //     })
+    // }
 }
 
 const HTTP_MODE: string = process.env.HTTP_MODE;
