@@ -1,5 +1,6 @@
 import * as line from '@line/bot-sdk';
 import { Readable } from "stream";
+import { LineSticker } from './interfaces';
 
 class LineBotClient {
     public config: line.MiddlewareConfig & line.ClientConfig = {
@@ -7,6 +8,13 @@ class LineBotClient {
         channelSecret: process.env.CHANNEL_SECRET
     };
     private client: line.Client = new line.Client(this.config);
+
+    public stickers: Array<LineSticker> = [
+        { packageId: '446', stickerId: '2010' },
+        { packageId: '6325', stickerId: '10979923' },
+        { packageId: '6325', stickerId: '10979917' },
+        { packageId: '6325', stickerId: '10979922' },
+    ];
 
     public replyMessage = (replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
         return this.client.replyMessage(replyToken, {

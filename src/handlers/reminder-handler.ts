@@ -1,5 +1,5 @@
 import { jsonStringify } from '../utils';
-import { Action, CronFn, HandlerFn, ReminderData } from '../interfaces';
+import { Action, CronFn, HandlerFn, LineSticker, ReminderData } from '../interfaces';
 import { CronJob } from 'cron';
 import lineBotClient from '../line-bot-client';
 import BaseHandler from './base-handler';
@@ -74,7 +74,8 @@ class ReminderHandler extends BaseHandler {
 
     protected cronFn: CronFn = (id: string, data: ReminderData) => {
         return () => {
-            lineBotClient.pushSticker(id, '6325', '10979923');
+            const sticker: LineSticker = lineBotClient.stickers[Math.floor(Math.random() * lineBotClient.stickers.length)];
+            lineBotClient.pushSticker(id, sticker.packageId, sticker.stickerId);
             lineBotClient.pushMessage(id, 'ลืมอะไรหรือเปล่านะ');
 
             setTimeout(() => {

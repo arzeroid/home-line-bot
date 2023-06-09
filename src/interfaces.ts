@@ -35,3 +35,8 @@ export interface LineNotifyResponse {
     status: number;
     message: string;
 }
+
+export interface LineSticker {
+    packageId: string;
+    stickerId: string;
+}
