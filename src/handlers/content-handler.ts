@@ -3,11 +3,21 @@ import * as fs from 'fs';
 import lineBotClient from '../line-bot-client';
 import { Readable } from 'stream';
 import { jsonStringify } from '../utils';
+import BaseHandler from './base-handler';
+import { Action, HandlerFn } from '../interfaces';
 
-class ContentHandler {
+class ContentHandler extends BaseHandler {
+
+    protected isCronData: boolean = false;
+    protected handlerName: string = 'ContentHandler';
+
     protected isAutoSave: boolean = true;
 
-    public handle = (event: line.MessageEvent): Promise<line.MessageAPIResponseBase> => {
+    public handleContent = (event: line.MessageEvent): Promise<line.MessageAPIResponseBase> => {
+        if (!this.isAutoSave) {
+            return;
+        }
+
         const source: line.EventSource = event.source;
         let id: string = null;
         if (source.type == 'user') {
@@ -15,35 +25,6 @@ class ContentHandler {
         }
         else if (source.type == 'group') {
             id = source.groupId;
-        }
-
-        if (event.message.type == 'text') {
-            let message: line.TextEventMessage = <line.TextEventMessage>event.message;
-            let text: string = message.text;
-
-            switch (text) {
-                case 'แสดงคำสั่งทั้งหมด':
-                    return lineBotClient.pushMessage(id, jsonStringify([
-                        'enable auto save',
-                        'disable auto save',
-                        'auto save status'
-                    ]));
-
-                case 'enable auto save':
-                    this.isAutoSave = true;
-                    return lineBotClient.pushMessage(id, `Enable Auto Save Content`);
-
-                case 'disable auto save':
-                    this.isAutoSave = false;
-                    return lineBotClient.pushMessage(id, `Disable Auto Save Content`);
-
-                case 'auto save status':
-                    return lineBotClient.pushMessage(id, `Auto Save Content Status: ${this.isAutoSave}`);
-            }
-        }
-
-        if (!this.isAutoSave) {
-            return;
         }
 
         let fileName: string = null;
@@ -74,8 +55,51 @@ class ContentHandler {
         }).then(() => {
             return lineBotClient.pushMessage(id, `${event.message.type} is saved as ${fileName}`);
         });
-
     }
+
+    protected enableAutoSaveFn: HandlerFn = (id: string, replyToken: string, text: string) => {
+        if (text.length > 0) {
+            return this.replyIncorrectSyntax(replyToken);
+        }
+
+        this.isAutoSave = true;
+        return lineBotClient.pushMessage(id, `Enable Auto Save Content`);
+    }
+
+    protected disableAutoSaveFn: HandlerFn = (id: string, replyToken: string, text: string) => {
+        if (text.length > 0) {
+            return this.replyIncorrectSyntax(replyToken);
+        }
+
+        this.isAutoSave = false;
+        return lineBotClient.pushMessage(id, `Disable Auto Save Content`);
+    }
+
+    protected autoSaveStatusFn: HandlerFn = (id: string, replyToken: string, text: string) => {
+        if (text.length > 0) {
+            return this.replyIncorrectSyntax(replyToken);
+        }
+
+        return lineBotClient.pushMessage(id, `Auto Save Content Status: ${this.isAutoSave}`);
+    }
+
+    protected actions: Array<Action> = [
+        {
+            keyword: 'enable auto save',
+            syntax: 'enable auto save',
+            fn: this.enableAutoSaveFn,
+        },
+        {
+            keyword: 'disable auto save',
+            syntax: 'disable auto save',
+            fn: this.disableAutoSaveFn,
+        },
+        {
+            keyword: 'auto save status',
+            syntax: 'auto save status',
+            fn: this.autoSaveStatusFn,
+        },
+    ];
 }
 
 const instance: ContentHandler = new ContentHandler();

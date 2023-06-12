@@ -40,6 +40,7 @@ export default class BaseHandler {
         else {
             this.data = JSON.parse(rawData);
         }
+
         this.writeFile();
     }
 

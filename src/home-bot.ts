@@ -40,7 +40,8 @@ function handleEvent(event: line.WebhookEvent) {
         const handlers: Array<BaseHandler> = [
             memoryHandler,
             reminderHandler,
-            scraperHandler
+            scraperHandler,
+            contentHandler
         ];
 
         const promises: Array<Promise<line.MessageAPIResponseBase>> = handlers.map(handler => handler.handle(event));
@@ -49,7 +50,7 @@ function handleEvent(event: line.WebhookEvent) {
     }
 
     if (event.source.userId == process.env.ADMIN_ID) {
-        return contentHandler.handle(event);
+        return contentHandler.handleContent(event);
     }
 }
 
