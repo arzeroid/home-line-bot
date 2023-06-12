@@ -10,6 +10,13 @@ class ReminderHandler extends BaseHandler {
     protected handlerName: string = 'ReminderHandler';
     protected filePath: string = process.env.REMINDER_FILE;
 
+    private stickers: Array<LineSticker> = [
+        { packageId: '446', stickerId: '2010' },
+        { packageId: '6325', stickerId: '10979923' },
+        { packageId: '6325', stickerId: '10979917' },
+        { packageId: '6325', stickerId: '10979922' },
+    ];
+
     protected addFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
         if (messages.length != 2) {
@@ -74,7 +81,7 @@ class ReminderHandler extends BaseHandler {
 
     protected cronFn: CronFn = (id: string, data: ReminderData) => {
         return () => {
-            const sticker: LineSticker = lineBotClient.stickers[Math.floor(Math.random() * lineBotClient.stickers.length)];
+            const sticker: LineSticker = this.stickers[Math.floor(Math.random() * this.stickers.length)];
             lineBotClient.pushSticker(id, sticker.packageId, sticker.stickerId);
             lineBotClient.pushMessage(id, 'ลืมอะไรหรือเปล่านะ');
 
