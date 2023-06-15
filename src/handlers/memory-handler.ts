@@ -89,7 +89,7 @@ class MemoryHandler extends BaseHandler {
     };
 
     protected showFn: HandlerFn = (id: string, replyToken: string, text: string) => {
-        const key: string = text;
+        const key: string = text.trim();
         if (key.length == 0) {
             return this.replyIncorrectSyntax(replyToken);
         }
@@ -110,7 +110,7 @@ class MemoryHandler extends BaseHandler {
         return lineBotClient.replyMessage(replyToken, jsonStringify(list));
     };
 
-    protected cancelFn: HandlerFn = (id: string, replyToken: string, text: string) => {
+    protected deleteFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
 
         const key: string = messages[0].trim();
@@ -163,7 +163,7 @@ class MemoryHandler extends BaseHandler {
         {
             keyword: 'ลบรายการ',
             syntax: 'ลบรายการ<ชื่อรายการ>:ลำดับรายการ',
-            fn: this.cancelFn,
+            fn: this.deleteFn,
         }
     ];
 }
