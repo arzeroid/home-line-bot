@@ -138,7 +138,7 @@ class MemoryHandler extends BaseHandler {
         },
         {
             keyword: 'เปลื่ยนชื่อรายการ',
-            syntax: 'เเปลื่ยนชื่อรายการ:ชื่อรายการเดิม:ชื่อรายการใหม่',
+            syntax: 'เปลื่ยนชื่อรายการ:ชื่อรายการเดิม:ชื่อรายการใหม่',
             fn: this.renameTopicFn,
         },
         {
