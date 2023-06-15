@@ -19,21 +19,46 @@ class MemoryHandler extends BaseHandler {
 
     protected deleteTopicFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
-        if (messages.length != 2) {
+        const length: number = messages.length;
+        if (length < 2 || length > 3) {
             return this.replyIncorrectSyntax(replyToken);
         }
 
         const key: string = messages[1].trim();
+        const isForce: boolean = (length == 3) && (messages[2].trim() == 'force');
 
         if (!this.data[id] || !this.data[id][key]) {
             return lineBotClient.replyMessage(replyToken, 'ไม่พบชื่อรายการที่ระบุ');
         }
 
-        if (this.data[id][key].length > 0) {
+        if (this.data[id][key].length > 0 && !isForce) {
             return lineBotClient.replyMessage(replyToken, 'ไม่สามารถลบชื่อรายการที่ไม่ว่างได้');
         }
 
         delete this.data[id][key];
+        this.isChange = true;
+        return lineBotClient.replyMessage(replyToken, 'ลบชื่อรายการเรียบร้อย');
+    }
+
+    protected renameTopicFn: HandlerFn = (id: string, replyToken: string, text: string) => {
+        const messages: Array<string> = text.split(':');
+        if (messages.length != 3) {
+            return this.replyIncorrectSyntax(replyToken);
+        }
+
+        const oldTopic: string = messages[1].trim();
+        const newTopic: string = messages[2].trim();
+
+        if (!this.data[id] || !this.data[id][oldTopic]) {
+            return lineBotClient.replyMessage(replyToken, 'ไม่พบชื่อรายการที่ระบุ');
+        }
+
+        if (this.data[id][newTopic]) {
+            return lineBotClient.replyMessage(replyToken, 'ชื่อรายการใหม่ซ้ำ');
+        }
+
+        this.data[id][newTopic] = this.data[id][oldTopic];
+        delete this.data[id][oldTopic];
         this.isChange = true;
         return lineBotClient.replyMessage(replyToken, 'ลบชื่อรายการเรียบร้อย');
     }
@@ -108,8 +133,13 @@ class MemoryHandler extends BaseHandler {
         },
         {
             keyword: 'ลบชื่อรายการ',
-            syntax: 'ลบชื่อรายการ:ชื่อรายการ',
+            syntax: 'ลบชื่อรายการ:ชื่อรายการ(:force)?',
             fn: this.deleteTopicFn,
+        },
+        {
+            keyword: 'เปลื่ยนชื่อรายการ',
+            syntax: 'เเปลื่ยนชื่อรายการ:ชื่อรายการเดิม:ชื่อรายการใหม่',
+            fn: this.renameTopicFn,
         },
         {
             keyword: 'เพิ่มรายการ',
