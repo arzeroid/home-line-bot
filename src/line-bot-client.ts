@@ -25,6 +25,15 @@ class LineBotClient {
         return this.client.replyMessage(replyToken, message);
     }
 
+    public replyVdo = (replyToken: string, url: string): Promise<line.MessageAPIResponseBase> => {
+        const message: line.VideoMessage = {
+            type: 'video',
+            originalContentUrl: url,
+            previewImageUrl: url
+        };
+        return this.client.replyMessage(replyToken, message);
+    }
+
     public pushMessage = (id: string, text: string): Promise<line.MessageAPIResponseBase> => {
         return this.client.pushMessage(id, {
             type: 'text',

@@ -104,6 +104,16 @@ class ContentHandler extends BaseHandler {
         return lineBotClient.replyImage(replyToken, url);
     }
 
+    protected showVideo: HandlerFn = (id: string, replyToken: string, text: string) => {
+        const messages: Array<string> = text.split(':');
+        if (messages.length != 2) {
+            return this.replyIncorrectSyntax(replyToken);
+        }
+
+        const url: string = `${process.env.HTTP_MODE.toLowerCase()}://${process.env.DOMAIN_NAME}/${messages[1].trim()}/${id}`;
+        return lineBotClient.replyVdo(replyToken, url);
+    }
+
     protected actions: Array<Action> = [
         {
             keyword: 'enable auto save',
@@ -129,6 +139,11 @@ class ContentHandler extends BaseHandler {
             keyword: 'show image',
             syntax: 'show image: filepath',
             fn: this.showImage,
+        },
+        {
+            keyword: 'show vdo',
+            syntax: 'show vdo: filepath',
+            fn: this.showVideo,
         },
     ];
 }
