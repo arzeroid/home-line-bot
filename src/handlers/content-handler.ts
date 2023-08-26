@@ -100,7 +100,7 @@ class ContentHandler extends BaseHandler {
             return this.replyIncorrectSyntax(replyToken);
         }
 
-        const url: string = `${process.env.HTTP_MODE.toLowerCase()}://${process.env.DOMAIN_NAME}/${messages[1]}/${id}`;
+        const url: string = `${process.env.HTTP_MODE.toLowerCase()}://${process.env.DOMAIN_NAME}/${messages[1].trim()}/${id}`;
         return lineBotClient.replyImage(replyToken, url);
     }
 
