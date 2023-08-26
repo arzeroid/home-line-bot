@@ -19,6 +19,7 @@ class ContentHandler extends BaseHandler {
         }
 
         const source: line.EventSource = event.source;
+        const replyToken: string = event.replyToken;
         let id: string = null;
         if (source.type == 'user') {
             id = source.userId;
@@ -53,7 +54,7 @@ class ContentHandler extends BaseHandler {
                 ws.close();
             })
         }).then(() => {
-            return lineBotClient.pushMessage(id, `${event.message.type} is saved as ${fileName}`);
+            return lineBotClient.replyMessage(replyToken, `${event.message.type} is saved as ${fileName}`);
         });
     }
 
@@ -63,7 +64,7 @@ class ContentHandler extends BaseHandler {
         }
 
         this.isAutoSave = true;
-        return lineBotClient.pushMessage(id, `Enable Auto Save Content`);
+        return lineBotClient.replyMessage(replyToken, `Enable Auto Save Content`);
     }
 
     protected disableAutoSaveFn: HandlerFn = (id: string, replyToken: string, text: string) => {
@@ -72,7 +73,7 @@ class ContentHandler extends BaseHandler {
         }
 
         this.isAutoSave = false;
-        return lineBotClient.pushMessage(id, `Disable Auto Save Content`);
+        return lineBotClient.replyMessage(replyToken, `Disable Auto Save Content`);
     }
 
     protected autoSaveStatusFn: HandlerFn = (id: string, replyToken: string, text: string) => {
@@ -80,7 +81,27 @@ class ContentHandler extends BaseHandler {
             return this.replyIncorrectSyntax(replyToken);
         }
 
-        return lineBotClient.pushMessage(id, `Auto Save Content Status: ${this.isAutoSave}`);
+        return lineBotClient.replyMessage(replyToken, `Auto Save Content Status: ${this.isAutoSave}`);
+    }
+
+    protected getContentUrl: HandlerFn = (id: string, replyToken: string, text: string) => {
+        const messages: Array<string> = text.split(':');
+        if (messages.length != 2) {
+            return this.replyIncorrectSyntax(replyToken);
+        }
+
+        const url: string = `${process.env.HTTP_MODE.toLowerCase()}://${process.env.DOMAIN_NAME}/${messages[1]}/${id}`;
+        return lineBotClient.replyMessage(replyToken, url);
+    }
+
+    protected showImage: HandlerFn = (id: string, replyToken: string, text: string) => {
+        const messages: Array<string> = text.split(':');
+        if (messages.length != 2) {
+            return this.replyIncorrectSyntax(replyToken);
+        }
+
+        const url: string = `${process.env.HTTP_MODE.toLowerCase()}://${process.env.DOMAIN_NAME}/${messages[1]}/${id}`;
+        return lineBotClient.replyImage(replyToken, url);
     }
 
     protected actions: Array<Action> = [
@@ -98,6 +119,16 @@ class ContentHandler extends BaseHandler {
             keyword: 'auto save status',
             syntax: 'auto save status',
             fn: this.autoSaveStatusFn,
+        },
+        {
+            keyword: 'get content url',
+            syntax: 'get content url: filepath',
+            fn: this.getContentUrl,
+        },
+        {
+            keyword: 'show image',
+            syntax: 'show image: filepath',
+            fn: this.showImage,
         },
     ];
 }

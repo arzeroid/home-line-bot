@@ -40,3 +40,9 @@ export interface LineSticker {
     packageId: string;
     stickerId: string;
 }
+
+export interface GetContentParams {
+    userId: string;
+    contentType: string;
+    filename: string;
+}

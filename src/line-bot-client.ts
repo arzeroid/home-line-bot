@@ -1,6 +1,5 @@
 import * as line from '@line/bot-sdk';
 import { Readable } from "stream";
-import { LineSticker } from './interfaces';
 
 class LineBotClient {
     public config: line.MiddlewareConfig & line.ClientConfig = {
@@ -10,10 +9,20 @@ class LineBotClient {
     private client: line.Client = new line.Client(this.config);
 
     public replyMessage = (replyToken: string, text: string): Promise<line.MessageAPIResponseBase> => {
-        return this.client.replyMessage(replyToken, {
+        const message: line.TextMessage = {
             type: 'text',
             text: text
-        });
+        };
+        return this.client.replyMessage(replyToken, message);
+    }
+
+    public replyImage = (replyToken: string, url: string): Promise<line.MessageAPIResponseBase> => {
+        const message: line.ImageMessage = {
+            type: 'image',
+            originalContentUrl: url,
+            previewImageUrl: url
+        };
+        return this.client.replyMessage(replyToken, message);
     }
 
     public pushMessage = (id: string, text: string): Promise<line.MessageAPIResponseBase> => {

@@ -13,10 +13,25 @@ import memoryHandler from './handlers/memory-handler';
 import scraperHandler from './handlers/scraper-handler';
 import contentHandler from './handlers/content-handler';
 import BaseHandler from './handlers/base-handler';
-import { jsonStringify } from './utils';
+import * as path from 'path';
+import { GetContentParams } from './interfaces';
 
 
 const app: Express = express();
+
+// app.use(express.static(path.join(__dirname, '../contents')));
+
+app.get('/contents/:contentType/:filename/:userId', (req, res, next) => {
+    const params: GetContentParams = req.params;
+    console.log(`${process.env.HTTP_MODE.toLowerCase()}://${process.env.DOMAIN_NAME}/contents/img/469681811065667893.jpg/U799457657586fa466f6d7fe0ba1806b5`)
+
+    if (params.userId == process.env.ADMIN_ID) {
+        res.sendFile(path.join(__dirname, '../contents', params.contentType, params.filename))
+    }
+    else {
+        next();
+    }
+});
 
 app.get('/', (req, res) => {
     res.send('Hello there !!!');
@@ -53,6 +68,10 @@ function handleEvent(event: line.WebhookEvent) {
         return contentHandler.handleContent(event);
     }
 }
+
+app.get('*', function (req, res) {
+    res.sendStatus(404);
+});
 
 const HTTP_MODE: string = process.env.HTTP_MODE;
 const CERT_PATH: string = process.env.CERT_PATH;
