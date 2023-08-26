@@ -25,6 +25,8 @@ const app: Express = express();
 app.get('/contents/:contentType/:filename/:hash', (req, res, next) => {
     const params: GetContentParams = req.params;
 
+    console.log(params);
+
     if (moment().isBefore(contentHandler.timeout) && md5(contentHandler.seed + process.env.ADMIN_ID)) {
         res.sendFile(path.join(__dirname, '../contents', params.contentType, params.filename))
     }
