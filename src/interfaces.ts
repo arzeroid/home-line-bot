@@ -42,7 +42,7 @@ export interface LineSticker {
 }
 
 export interface GetContentParams {
-    userId: string;
+    hash: string;
     contentType: string;
     filename: string;
 }

@@ -5,6 +5,9 @@ import { Readable } from 'stream';
 import { jsonStringify } from '../utils';
 import BaseHandler from './base-handler';
 import { Action, HandlerFn } from '../interfaces';
+import { Moment } from 'moment';
+import moment = require('moment');
+import * as md5 from 'js-md5';
 
 class ContentHandler extends BaseHandler {
 
@@ -12,6 +15,10 @@ class ContentHandler extends BaseHandler {
     protected handlerName: string = 'ContentHandler';
 
     protected isAutoSave: boolean = true;
+
+    //  for get content
+    public seed: number = 0;
+    public timeout: Moment = null;
 
     public handleContent = (event: line.MessageEvent): Promise<line.MessageAPIResponseBase> => {
         if (!this.isAutoSave) {
@@ -85,7 +92,10 @@ class ContentHandler extends BaseHandler {
     }
 
     private getContentUrl = (id: string, message: string): string => {
-        const url: string = `${process.env.HTTP_MODE.toLowerCase()}://${process.env.DOMAIN_NAME}/${message.trim()}/${id}`;
+        this.timeout = moment().add(process.env.GET_CONTENT_TIMEOUT_MIN, 'minutes');
+        this.seed = Math.random();
+        const hash: string = md5(this.seed + id)
+        const url: string = `${process.env.HTTP_MODE.toLowerCase()}://${process.env.DOMAIN_NAME}/${message.trim()}/${hash}`;
         return url;
     }
 

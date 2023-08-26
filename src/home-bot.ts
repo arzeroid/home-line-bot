@@ -15,17 +15,17 @@ import contentHandler from './handlers/content-handler';
 import BaseHandler from './handlers/base-handler';
 import * as path from 'path';
 import { GetContentParams } from './interfaces';
-
+import * as md5 from 'js-md5';
+import moment = require('moment');
 
 const app: Express = express();
 
 // app.use(express.static(path.join(__dirname, '../contents')));
 
-app.get('/contents/:contentType/:filename/:userId', (req, res, next) => {
+app.get('/contents/:contentType/:filename/:hash', (req, res, next) => {
     const params: GetContentParams = req.params;
-    console.log(`${process.env.HTTP_MODE.toLowerCase()}://${process.env.DOMAIN_NAME}/contents/img/469681811065667893.jpg/U799457657586fa466f6d7fe0ba1806b5`)
 
-    if (params.userId == process.env.ADMIN_ID) {
+    if (moment().isBefore(contentHandler.timeout) && md5(contentHandler.seed + process.env.ADMIN_ID)) {
         res.sendFile(path.join(__dirname, '../contents', params.contentType, params.filename))
     }
     else {
