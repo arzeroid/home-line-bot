@@ -84,14 +84,9 @@ class ContentHandler extends BaseHandler {
         return lineBotClient.replyMessage(replyToken, `Auto Save Content Status: ${this.isAutoSave}`);
     }
 
-    protected getContentUrl: HandlerFn = (id: string, replyToken: string, text: string) => {
-        const messages: Array<string> = text.split(':');
-        if (messages.length != 2) {
-            return this.replyIncorrectSyntax(replyToken);
-        }
-
-        const url: string = `${process.env.HTTP_MODE.toLowerCase()}://${process.env.DOMAIN_NAME}/${messages[1]}/${id}`;
-        return lineBotClient.replyMessage(replyToken, url);
+    private getContentUrl = (id: string, message: string): string => {
+        const url: string = `${process.env.HTTP_MODE.toLowerCase()}://${process.env.DOMAIN_NAME}/${message.trim()}/${id}`;
+        return url;
     }
 
     protected showImage: HandlerFn = (id: string, replyToken: string, text: string) => {
@@ -100,8 +95,7 @@ class ContentHandler extends BaseHandler {
             return this.replyIncorrectSyntax(replyToken);
         }
 
-        const url: string = `${process.env.HTTP_MODE.toLowerCase()}://${process.env.DOMAIN_NAME}/${messages[1].trim()}/${id}`;
-        return lineBotClient.replyImage(replyToken, url);
+        return lineBotClient.replyImage(replyToken, this.getContentUrl(id, messages[1]));
     }
 
     protected showVideo: HandlerFn = (id: string, replyToken: string, text: string) => {
@@ -110,8 +104,7 @@ class ContentHandler extends BaseHandler {
             return this.replyIncorrectSyntax(replyToken);
         }
 
-        const url: string = `${process.env.HTTP_MODE.toLowerCase()}://${process.env.DOMAIN_NAME}/${messages[1].trim()}/${id}`;
-        return lineBotClient.replyVdo(replyToken, url);
+        return lineBotClient.replyVdo(replyToken, this.getContentUrl(id, messages[1]));
     }
 
     protected actions: Array<Action> = [
@@ -129,11 +122,6 @@ class ContentHandler extends BaseHandler {
             keyword: 'auto save status',
             syntax: 'auto save status',
             fn: this.autoSaveStatusFn,
-        },
-        {
-            keyword: 'get content url',
-            syntax: 'get content url: filepath',
-            fn: this.getContentUrl,
         },
         {
             keyword: 'show image',
