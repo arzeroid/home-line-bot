@@ -13,6 +13,7 @@ import * as path from 'path';
 class ContentHandler extends BaseHandler {
 
     protected isCronData: boolean = false;
+    protected isAdminOnly: boolean = true;
     protected handlerName: string = 'ContentHandler';
 
     protected isAutoSave: boolean = true;
@@ -147,6 +148,34 @@ class ContentHandler extends BaseHandler {
         }
     }
 
+    private getContentList: HandlerFn = (id: string, replyToken: string, text: string) => {
+        const messages: Array<string> = text.split(':');
+        if (messages.length != 2) {
+            return this.replyIncorrectSyntax(replyToken);
+        }
+
+        let folder: string = 'contents/';
+        switch (messages[1].trim()) {
+            case 'image':
+                folder += 'img';
+                break;
+            case 'video':
+                folder += 'vdo';
+                break;
+            case 'audio':
+                folder += 'audio';
+                break;
+            case 'file':
+                folder += 'files';
+                break;
+            default:
+                return;
+        }
+        const folderPath: fs.PathLike = path.join(__dirname, '../..', folder);
+        const filenames: string[] = fs.readdirSync(folderPath);
+        return lineBotClient.replyMessage(replyToken, filenames.join('\n'));
+    }
+
     protected actions: Array<Action> = [
         {
             keyword: 'enable auto save',
@@ -177,6 +206,11 @@ class ContentHandler extends BaseHandler {
             keyword: 'delete content',
             syntax: 'delete content: filepath',
             fn: this.deleteContent,
+        },
+        {
+            keyword: 'get content list',
+            syntax: 'get content list: type',
+            fn: this.getContentList,
         },
     ];
 }

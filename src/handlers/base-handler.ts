@@ -7,10 +7,11 @@ import lineBotClient from '../line-bot-client';
 
 export default class BaseHandler {
     protected isChange: boolean = false;
+    protected isAdminOnly: boolean = false;
 
     // must be init on inherit class
     protected handlerName: string;
-    protected filePath: string;
+    protected filePath: string; // file to stroe data for that handler
     protected isCronData: boolean;
     protected cronFn: CronFn; // required if isCronData = true
     protected actions: Array<Action> = [];
@@ -56,6 +57,10 @@ export default class BaseHandler {
         }
         else if (source.type == 'group') {
             id = source.groupId;
+        }
+
+        if (this.isAdminOnly && id != process.env.ADMIN_ID) {
+            return;
         }
 
         let message: line.TextEventMessage = <line.TextEventMessage>event.message;
