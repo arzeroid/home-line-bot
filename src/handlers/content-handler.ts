@@ -133,7 +133,7 @@ class ContentHandler extends BaseHandler {
 
     private deleteContent: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
-        if (messages.length != 2 || !messages[1].startsWith('contents')) {
+        if (messages.length != 2 || !messages[1].trim().startsWith('contents')) {
             return this.replyIncorrectSyntax(replyToken);
         }
 
