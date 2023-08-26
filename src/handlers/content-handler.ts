@@ -156,24 +156,18 @@ class ContentHandler extends BaseHandler {
 
         let folder: string = 'contents/';
         switch (messages[1].trim()) {
-            case 'image':
-                folder += 'img';
-                break;
-            case 'video':
-                folder += 'vdo';
-                break;
+            case 'img':
+            case 'vdo':
             case 'audio':
-                folder += 'audio';
-                break;
-            case 'file':
-                folder += 'files';
+            case 'files':
+                folder += messages[1].trim();
                 break;
             default:
                 return;
         }
         const folderPath: fs.PathLike = path.join(__dirname, '../..', folder);
         const filenames: string[] = fs.readdirSync(folderPath);
-        return lineBotClient.replyMessage(replyToken, filenames.join('\n'));
+        return lineBotClient.replyMessage(replyToken, `Files in ${folder}\n\n${filenames.join('\n')}`);
     }
 
     protected actions: Array<Action> = [
@@ -209,7 +203,7 @@ class ContentHandler extends BaseHandler {
         },
         {
             keyword: 'get content list',
-            syntax: 'get content list: type',
+            syntax: 'get content list: (img, vdo, audio, files)',
             fn: this.getContentList,
         },
     ];
