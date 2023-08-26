@@ -20,8 +20,7 @@ import moment = require('moment');
 
 const app: Express = express();
 
-// app.use(express.static(path.join(__dirname, '../contents')));
-
+// for line to get content when bot reply once
 app.get('/contents/:contentType/:filename/:hash', (req, res, next) => {
     const params: GetContentParams = req.params;
 

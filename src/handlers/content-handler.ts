@@ -8,6 +8,7 @@ import { Action, HandlerFn } from '../interfaces';
 import { Moment } from 'moment';
 import moment = require('moment');
 import * as md5 from 'js-md5';
+import * as path from 'path';
 
 class ContentHandler extends BaseHandler {
 
@@ -92,11 +93,17 @@ class ContentHandler extends BaseHandler {
     }
 
     private getContentUrl = (id: string, message: string): string => {
-        this.timeout = moment().add(process.env.GET_CONTENT_TIMEOUT_MIN, 'minutes');
-        this.seed = Math.random();
-        const hash: string = md5(this.seed + id)
-        const url: string = `${process.env.HTTP_MODE.toLowerCase()}://${process.env.DOMAIN_NAME}/${message.trim()}/${hash}`;
-        return url;
+
+        if (fs.existsSync(path.join(__dirname, '../..', message.trim()))) {
+            this.timeout = moment().add(process.env.GET_CONTENT_TIMEOUT_MIN, 'minutes');
+            this.seed = Math.random();
+            const hash: string = md5(this.seed + id)
+            const url: string = `${process.env.HTTP_MODE.toLowerCase()}://${process.env.DOMAIN_NAME}/${message.trim()}/${hash}`;
+            return url;
+        }
+        else {
+            throw new Error("not found");
+        }
     }
 
     protected showImage: HandlerFn = (id: string, replyToken: string, text: string) => {
@@ -105,7 +112,11 @@ class ContentHandler extends BaseHandler {
             return this.replyIncorrectSyntax(replyToken);
         }
 
-        return lineBotClient.replyImage(replyToken, this.getContentUrl(id, messages[1]));
+        try {
+            return lineBotClient.replyImage(replyToken, this.getContentUrl(id, messages[1]));
+        } catch (err) {
+            return lineBotClient.replyMessage(replyToken, `File not exists: ${messages[1]}`);
+        }
     }
 
     protected showVideo: HandlerFn = (id: string, replyToken: string, text: string) => {
@@ -113,8 +124,27 @@ class ContentHandler extends BaseHandler {
         if (messages.length != 2) {
             return this.replyIncorrectSyntax(replyToken);
         }
+        try {
+            return lineBotClient.replyVdo(replyToken, this.getContentUrl(id, messages[1]));
+        } catch (err) {
+            return lineBotClient.replyMessage(replyToken, `File not exists: ${messages[1]}`);
+        }
+    }
 
-        return lineBotClient.replyVdo(replyToken, this.getContentUrl(id, messages[1]));
+    private deleteContent: HandlerFn = (id: string, replyToken: string, text: string) => {
+        const messages: Array<string> = text.split(':');
+        if (messages.length != 2 || !messages[1].startsWith('contents')) {
+            return this.replyIncorrectSyntax(replyToken);
+        }
+
+        const filePath: fs.PathLike = path.join(__dirname, '../..', messages[1].trim());
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+            return lineBotClient.replyMessage(replyToken, `Deleted file: ${messages[1]}`);
+        }
+        else {
+            return lineBotClient.replyMessage(replyToken, `File not exists: ${messages[1]}`);
+        }
     }
 
     protected actions: Array<Action> = [
@@ -142,6 +172,11 @@ class ContentHandler extends BaseHandler {
             keyword: 'show vdo',
             syntax: 'show vdo: filepath',
             fn: this.showVideo,
+        },
+        {
+            keyword: 'delete content',
+            syntax: 'delete content: filepath',
+            fn: this.deleteContent,
         },
     ];
 }
