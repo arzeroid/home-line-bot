@@ -21,18 +21,7 @@ import moment = require('moment');
 const app: Express = express();
 
 // for line to get content when bot reply once
-app.get('/contents/:contentType/:filename/:hash', (req, res, next) => {
-    const params: GetContentParams = req.params;
-
-    console.log(params);
-
-    if (moment().isBefore(contentHandler.timeout) && md5(contentHandler.seed + process.env.ADMIN_ID)) {
-        res.sendFile(path.join(__dirname, '../contents', params.contentType, params.filename))
-    }
-    else {
-        next();
-    }
-});
+app.get('/contents/:contentType/:filename/:hash', contentHandler.getContent);
 
 app.get('/', (req, res) => {
     res.send('Hello there !!!');

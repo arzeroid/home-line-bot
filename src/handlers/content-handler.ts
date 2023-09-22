@@ -4,7 +4,7 @@ import lineBotClient from '../line-bot-client';
 import { Readable } from 'stream';
 import { jsonStringify } from '../utils';
 import BaseHandler from './base-handler';
-import { Action, HandlerFn } from '../interfaces';
+import { Action, GetContentParams, HandlerFn } from '../interfaces';
 import { Moment } from 'moment';
 import moment = require('moment');
 import * as md5 from 'js-md5';
@@ -104,6 +104,19 @@ class ContentHandler extends BaseHandler {
         }
         else {
             throw new Error("not found");
+        }
+    }
+
+    public getContent = (req, res, next) => {
+        const params: GetContentParams = req.params;
+
+        console.log(params);
+
+        if (moment().isBefore(this.timeout) && md5(this.seed + process.env.ADMIN_ID) == params.hash) {
+            res.sendFile(path.join(__dirname, '../contents', params.contentType, params.filename))
+        }
+        else {
+            next();
         }
     }
 
