@@ -49,7 +49,7 @@ class ReminderHandler extends BaseHandler {
 
     protected addMessageFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
-        if (messages.length != 3) {
+        if (messages.length < 3) {
             return this.replyIncorrectSyntax(replyToken);
         }
 
