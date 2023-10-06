@@ -4,14 +4,15 @@ import { CronCommand } from "cron";
 
 export interface ReminderData {
     cronTime: string | Date;
-    message: string
+    message: string;
+    showSticker?: boolean;
 }
 
 export interface ScraperData {
     cronTime: string | Date;
-    url: string
-    element: string
-    notifyWhen: ScraperNotifyEnum
+    url: string;
+    element: string;
+    notifyWhen: ScraperNotifyEnum;
 }
 
 export type CronData = ReminderData | ScraperData;

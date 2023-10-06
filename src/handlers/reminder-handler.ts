@@ -37,7 +37,38 @@ class ReminderHandler extends BaseHandler {
 
         const data: ReminderData = {
             cronTime: cronTime,
-            message: topic
+            message: topic,
+            showSticker: true
+        };
+        const job: CronJob = this.createNewCronJob(id, data);
+        this.cronData[id].push(data);
+        this.jobs[id].push(job);
+        this.isChange = true;
+        return lineBotClient.replyMessage(replyToken, 'เพิ่มการแจ้งเตือนแล้ว');
+    };
+
+    protected addMessageFn: HandlerFn = (id: string, replyToken: string, text: string) => {
+        const messages: Array<string> = text.split(':');
+        if (messages.length != 3) {
+            return this.replyIncorrectSyntax(replyToken);
+        }
+
+        const cronTime: string = messages[1].trim();
+        const message: string = messages[2].trim();
+
+        if (message.length == 0 || cronTime.length == 0 || cronTime.split(' ').length < 5) {
+            return this.replyIncorrectSyntax(replyToken);
+        }
+
+        if (!this.cronData[id]) {
+            this.cronData[id] = [];
+            this.jobs[id] = [];
+        }
+
+        const data: ReminderData = {
+            cronTime: cronTime,
+            message: message,
+            showSticker: false
         };
         const job: CronJob = this.createNewCronJob(id, data);
         this.cronData[id].push(data);
@@ -81,9 +112,11 @@ class ReminderHandler extends BaseHandler {
 
     protected cronFn: CronFn = (id: string, data: ReminderData) => {
         return () => {
-            const sticker: LineSticker = this.stickers[Math.floor(Math.random() * this.stickers.length)];
-            lineBotClient.pushSticker(id, sticker.packageId, sticker.stickerId);
-            lineBotClient.pushMessage(id, 'ลืมอะไรหรือเปล่านะ');
+            if (data.showSticker) {
+                const sticker: LineSticker = this.stickers[Math.floor(Math.random() * this.stickers.length)];
+                lineBotClient.pushSticker(id, sticker.packageId, sticker.stickerId);
+                lineBotClient.pushMessage(id, 'ลืมอะไรหรือเปล่านะ');
+            }
 
             setTimeout(() => {
                 lineBotClient.pushMessage(id, `อย่าลืม${data.message}นะ`);
@@ -96,6 +129,11 @@ class ReminderHandler extends BaseHandler {
             keyword: 'เพิ่มการแจ้งเตือน',
             syntax: 'เพิ่มการแจ้งเตือน<ชื่อการแจ้งเตือน>:crontime',
             fn: this.addFn,
+        },
+        {
+            keyword: 'เพิ่มข้อความเตือน',
+            syntax: 'เพิ่มข้อความเตือน:crontime:message',
+            fn: this.addMessageFn,
         },
         {
             keyword: 'แสดงการแจ้งเตือน',
