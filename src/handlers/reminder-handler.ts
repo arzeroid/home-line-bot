@@ -54,7 +54,7 @@ class ReminderHandler extends BaseHandler {
         }
 
         const cronTime: string = messages[1].trim();
-        const message: string = messages[2].trim();
+        const message: string = messages.slice(2).join(':').trim();
 
         if (message.length == 0 || cronTime.length == 0 || cronTime.split(' ').length < 5) {
             return this.replyIncorrectSyntax(replyToken);
