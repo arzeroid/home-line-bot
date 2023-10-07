@@ -38,7 +38,7 @@ class ReminderHandler extends BaseHandler {
         const data: ReminderData = {
             cronTime: cronTime,
             message: topic,
-            showSticker: true
+            raw: false
         };
         const job: CronJob = this.createNewCronJob(id, data);
         this.cronData[id].push(data);
@@ -68,7 +68,7 @@ class ReminderHandler extends BaseHandler {
         const data: ReminderData = {
             cronTime: cronTime,
             message: message,
-            showSticker: false
+            raw: true
         };
         const job: CronJob = this.createNewCronJob(id, data);
         this.cronData[id].push(data);
@@ -112,15 +112,19 @@ class ReminderHandler extends BaseHandler {
 
     protected cronFn: CronFn = (id: string, data: ReminderData) => {
         return () => {
-            if (data.showSticker) {
+            if (!data.raw) {
                 const sticker: LineSticker = this.stickers[Math.floor(Math.random() * this.stickers.length)];
                 lineBotClient.pushSticker(id, sticker.packageId, sticker.stickerId);
                 lineBotClient.pushMessage(id, 'ลืมอะไรหรือเปล่านะ');
-            }
 
-            setTimeout(() => {
-                lineBotClient.pushMessage(id, `อย่าลืม${data.message}นะ`);
-            }, 10000)
+
+                setTimeout(() => {
+                    lineBotClient.pushMessage(id, `อย่าลืม${data.message}นะ`);
+                }, 10000);
+            }
+            else {
+                lineBotClient.pushMessage(id, `แจ้งเตือน: ${data.message}`);
+            }
         }
     };
 

@@ -5,7 +5,7 @@ import { CronCommand } from "cron";
 export interface ReminderData {
     cronTime: string | Date;
     message: string;
-    showSticker?: boolean;
+    raw: boolean;
 }
 
 export interface ScraperData {
