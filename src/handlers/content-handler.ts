@@ -145,6 +145,18 @@ class ContentHandler extends BaseHandler {
         }
     }
 
+    protected showFile: HandlerFn = (id: string, replyToken: string, text: string) => {
+        const messages: Array<string> = text.split(':');
+        if (messages.length != 2) {
+            return this.replyIncorrectSyntax(replyToken);
+        }
+        try {
+            return lineBotClient.replyMessage(replyToken, this.getContentUrl(id, messages[1]));
+        } catch (err) {
+            return lineBotClient.replyMessage(replyToken, `File not exists: ${messages[1]}`);
+        }
+    }
+
     private deleteContent: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
         if (messages.length != 2 || !messages[1].trim().startsWith('contents')) {
@@ -208,6 +220,11 @@ class ContentHandler extends BaseHandler {
             keyword: 'show vdo',
             syntax: 'show vdo: filepath',
             fn: this.showVideo,
+        },
+        {
+            keyword: 'show file',
+            syntax: 'show file: filepath',
+            fn: this.showFile,
         },
         {
             keyword: 'delete content',
