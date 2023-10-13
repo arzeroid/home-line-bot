@@ -101,8 +101,8 @@ class ReminderHandler extends BaseHandler {
 
     protected actions: Array<Action> = [
         {
-            keyword: 'เพิ่มข้อความเตือน',
-            syntax: 'เพิ่มข้อความเตือน:crontime:is_raw:message',
+            keyword: 'เพิ่มการแจ้งเตือน',
+            syntax: 'เพิ่มการแจ้งเตือน:crontime:is_raw:message',
             fn: this.addFn,
         },
         {
