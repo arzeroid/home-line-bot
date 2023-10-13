@@ -157,7 +157,7 @@ class ContentHandler extends BaseHandler {
         }
     }
 
-    private deleteContent: HandlerFn = (id: string, replyToken: string, text: string) => {
+    protected deleteContent: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
         if (messages.length != 2 || !messages[1].trim().startsWith('contents')) {
             return this.replyIncorrectSyntax(replyToken);
@@ -173,7 +173,7 @@ class ContentHandler extends BaseHandler {
         }
     }
 
-    private getContentList: HandlerFn = (id: string, replyToken: string, text: string) => {
+    protected getContentList: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
         if (messages.length != 2) {
             return this.replyIncorrectSyntax(replyToken);
