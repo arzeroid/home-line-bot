@@ -19,42 +19,13 @@ class ReminderHandler extends BaseHandler {
 
     protected addFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
-        if (messages.length != 2) {
-            return this.replyIncorrectSyntax(replyToken);
-        }
-
-        const topic: string = messages[0].trim();
-        const cronTime: string = messages[1].trim();
-
-        if (topic.length == 0 || cronTime.length == 0 || cronTime.split(' ').length < 5) {
-            return this.replyIncorrectSyntax(replyToken);
-        }
-
-        if (!this.cronData[id]) {
-            this.cronData[id] = [];
-            this.jobs[id] = [];
-        }
-
-        const data: ReminderData = {
-            cronTime: cronTime,
-            message: topic,
-            raw: false
-        };
-        const job: CronJob = this.createNewCronJob(id, data);
-        this.cronData[id].push(data);
-        this.jobs[id].push(job);
-        this.isChange = true;
-        return lineBotClient.replyMessage(replyToken, 'เพิ่มการแจ้งเตือนแล้ว');
-    };
-
-    protected addMessageFn: HandlerFn = (id: string, replyToken: string, text: string) => {
-        const messages: Array<string> = text.split(':');
-        if (messages.length < 3) {
+        if (messages.length < 4) {
             return this.replyIncorrectSyntax(replyToken);
         }
 
         const cronTime: string = messages[1].trim();
-        const message: string = messages.slice(2).join(':').trim();
+        const isRaw: boolean = messages[2].trim() == 'true';
+        const message: string = messages.slice(3).join(':').trim();
 
         if (message.length == 0 || cronTime.length == 0 || cronTime.split(' ').length < 5) {
             return this.replyIncorrectSyntax(replyToken);
@@ -68,7 +39,7 @@ class ReminderHandler extends BaseHandler {
         const data: ReminderData = {
             cronTime: cronTime,
             message: message,
-            raw: true
+            raw: isRaw
         };
         const job: CronJob = this.createNewCronJob(id, data);
         this.cronData[id].push(data);
@@ -130,14 +101,9 @@ class ReminderHandler extends BaseHandler {
 
     protected actions: Array<Action> = [
         {
-            keyword: 'เพิ่มการแจ้งเตือน',
-            syntax: 'เพิ่มการแจ้งเตือน<ชื่อการแจ้งเตือน>:crontime',
-            fn: this.addFn,
-        },
-        {
             keyword: 'เพิ่มข้อความเตือน',
-            syntax: 'เพิ่มข้อความเตือน:crontime:message',
-            fn: this.addMessageFn,
+            syntax: 'เพิ่มข้อความเตือน:crontime:is_raw:message',
+            fn: this.addFn,
         },
         {
             keyword: 'แสดงการแจ้งเตือน',
