@@ -113,7 +113,7 @@ class ContentHandler extends BaseHandler {
         console.log(params);
 
         if (moment().isBefore(this.timeout) && md5(this.seed + process.env.ADMIN_ID) == params.hash) {
-            res.sendFile(path.join(__dirname, '../contents', params.contentType, params.filename))
+            res.sendFile(path.join(__dirname, '../../contents', params.contentType, params.filename))
         }
         else {
             next();
