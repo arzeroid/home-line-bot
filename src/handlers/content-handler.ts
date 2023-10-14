@@ -157,15 +157,20 @@ class ContentHandler extends BaseHandler {
         }
     }
 
-    protected showFile: HandlerFn = (id: string, replyToken: string, text: string) => {
+    protected showContentLink: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
-        if (messages.length != 2) {
+        if (messages.length != 3) {
             return this.replyIncorrectSyntax(replyToken);
         }
 
-        const filename: string = messages[1].trim();
+        const subPath: string = messages[1].trim();
+        if (!this.subPaths.includes(subPath)) {
+            return this.replyIncorrectSyntax(replyToken);
+        }
+
+        const filename: string = messages[2].trim();
         try {
-            return lineBotClient.replyMessage(replyToken, this.getContentUrl(id, 'files', filename));
+            return lineBotClient.replyMessage(replyToken, this.getContentUrl(id, subPath, filename));
         } catch (err) {
             return lineBotClient.replyMessage(replyToken, `File not exists: ${filename}`);
         }
@@ -277,9 +282,9 @@ class ContentHandler extends BaseHandler {
             fn: this.showVideo,
         },
         {
-            keyword: 'show file',
-            syntax: 'show file: filepath',
-            fn: this.showFile,
+            keyword: 'show link',
+            syntax: 'show link: (img, vdo, audio, files): filename',
+            fn: this.showContentLink,
         },
         {
             keyword: 'rename content',

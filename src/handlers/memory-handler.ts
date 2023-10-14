@@ -20,7 +20,7 @@ class MemoryHandler extends BaseHandler {
     protected deleteTopicFn: HandlerFn = (id: string, replyToken: string, text: string) => {
         const messages: Array<string> = text.split(':');
         const length: number = messages.length;
-        if (length < 1 || length > 2) {
+        if (length != 1 && length != 2) {
             return this.replyIncorrectSyntax(replyToken);
         }
 
