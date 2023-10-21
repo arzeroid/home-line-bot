@@ -12,11 +12,8 @@ import reminderHandler from './handlers/reminder-handler';
 import memoryHandler from './handlers/memory-handler';
 import scraperHandler from './handlers/scraper-handler';
 import contentHandler from './handlers/content-handler';
+import keyValueHandler from './handlers/key-value-handler';
 import BaseHandler from './handlers/base-handler';
-import * as path from 'path';
-import { GetContentParams } from './interfaces';
-import * as md5 from 'js-md5';
-import moment = require('moment');
 
 const app: Express = express();
 
@@ -46,10 +43,18 @@ function handleEvent(event: line.WebhookEvent) {
             memoryHandler,
             reminderHandler,
             scraperHandler,
-            contentHandler
+            keyValueHandler
         ];
 
-        const promises: Array<Promise<line.MessageAPIResponseBase>> = handlers.map(handler => handler.handle(event));
+        const adminHandlers: Array<BaseHandler> = [
+            contentHandler,
+        ];
+
+        let promises: Array<Promise<line.MessageAPIResponseBase>> = handlers.map(handler => handler.handle(event));
+
+        if (event.source.userId == process.env.ADMIN_ID) {
+            promises = promises.concat(adminHandlers.map(handler => handler.handle(event)));
+        }
 
         return Promise.all(promises);
     }

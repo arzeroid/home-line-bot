@@ -7,6 +7,7 @@ class MemoryHandler extends BaseHandler {
 
     protected isCronData: boolean = false;
     protected handlerName: string = 'MemoryHandler';
+    protected data: NodeJS.Dict<NodeJS.Dict<Array<string>>>;
     protected filePath: string = process.env.MEMORY_FILE;
 
     protected viewAllTopicFn: HandlerFn = (id: string, replyToken: string, text: string) => {

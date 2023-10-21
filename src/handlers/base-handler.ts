@@ -17,7 +17,7 @@ export default class BaseHandler {
     protected actions: Array<Action> = [];
 
     // variables when isCronData = false
-    protected data: NodeJS.Dict<NodeJS.Dict<Array<string>>>;
+    protected data: NodeJS.Dict<NodeJS.Dict<Array<string> | string>>;
 
     // variables when isCronData = true
     protected cronData: NodeJS.Dict<Array<CronData>>;
@@ -30,9 +30,9 @@ export default class BaseHandler {
             this.cronData = JSON.parse(rawData);
 
             for (const id in this.cronData) {
-                const data: Array<CronData> = <Array<CronData>>this.cronData[id];
+                const cronData: Array<CronData> = <Array<CronData>>this.cronData[id];
                 this.jobs[id] = [];
-                for (const d of data) {
+                for (const d of cronData) {
                     const job: CronJob = this.createNewCronJob(id, d);
                     this.jobs[id].push(job);
                 }
