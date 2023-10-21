@@ -11,7 +11,7 @@ export default class BaseHandler {
 
     // must be init on inherit class
     protected handlerName: string;
-    protected filePath: string; // file to stroe data for that handler
+    protected filePath: string; // file to store data for that handler
     protected isCronData: boolean;
     protected cronFn: CronFn; // required if isCronData = true
     protected actions: Array<Action> = [];
