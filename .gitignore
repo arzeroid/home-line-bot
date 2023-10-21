@@ -102,8 +102,4 @@ dist
 
 # TernJS port file
 .tern-port
-/resources/memory.json
-/resources/cronjob.json
-/resources/scraper.json
-/resources/reminder.json
-/resources/device-manager.json
+/resources/*.json
